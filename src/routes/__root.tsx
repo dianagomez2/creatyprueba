@@ -72,19 +72,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Creaty — Mentorea con más claridad y menos trabajo operativo" },
+      {
+        name: "description",
+        content:
+          "Creaty usa IA para ayudar a mentores y emprendedores a organizar información, hacer seguimiento y orientar cada mentoría con mayor precisión.",
+      },
+      { name: "author", content: "Creaty" },
+      { property: "og:title", content: "Creaty — Mentoría empresarial con IA" },
+      {
+        property: "og:description",
+        content:
+          "Centraliza información, automatiza el seguimiento y recibe recomendaciones inteligentes para cada mentoría.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap",
       },
     ],
   }),
