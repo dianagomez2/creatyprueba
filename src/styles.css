@@ -1,0 +1,123 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-neon: var(--neon);
+  --color-orange-brand: var(--orange-brand);
+  --color-lilac: var(--lilac);
+  --color-beige: var(--beige);
+  --font-display: "Poppins", system-ui, sans-serif;
+  --font-sans: "Poppins", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: #10110e;
+  --foreground: #f2eee9;
+  --card: #15170f;
+  --card-foreground: #f2eee9;
+  --popover: #15170f;
+  --popover-foreground: #f2eee9;
+  --primary: #e5fe00;
+  --primary-foreground: #10110e;
+  --secondary: #1a1c14;
+  --secondary-foreground: #f2eee9;
+  --muted: #1a1c14;
+  --muted-foreground: #8a8c80;
+  --accent: #1f211a;
+  --accent-foreground: #f2eee9;
+  --destructive: #fd5102;
+  --destructive-foreground: #f2eee9;
+  --border: rgba(242, 238, 233, 0.08);
+  --input: rgba(242, 238, 233, 0.06);
+  --ring: #e5fe00;
+  --neon: #e5fe00;
+  --orange-brand: #fd5102;
+  --lilac: #c8a1e7;
+  --beige: #f2eee9;
+}
+
+.dark {
+  --background: #10110e;
+  --foreground: #f2eee9;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .glow-neon {
+    box-shadow: 0 0 0 1px rgba(229, 254, 0, 0.15),
+                0 0 40px -8px rgba(229, 254, 0, 0.45),
+                0 0 100px -20px rgba(229, 254, 0, 0.35);
+  }
+  .text-glow-neon {
+    text-shadow: 0 0 24px rgba(229, 254, 0, 0.45);
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(rgba(242,238,233,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(242,238,233,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .radial-fade {
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  }
+  .glass {
+    background: linear-gradient(180deg, rgba(242,238,233,0.04), rgba(242,238,233,0.01));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(242,238,233,0.07);
+  }
+  .neon-divider {
+    background: linear-gradient(90deg, transparent, rgba(229,254,0,0.6), transparent);
+  }
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #10110e; }
+::-webkit-scrollbar-thumb { background: #1f211a; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #2a2d24; }
