@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import creatyLogo from "@/assets/creaty-logo.png";
 import { motion, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
@@ -96,14 +97,12 @@ function NeonButton({
 
 function Logo({ className = "" }: { className?: string }) {
   return (
-    <a href="#top" className={`inline-flex items-center gap-2 ${className}`}>
-      <svg viewBox="0 0 32 32" className="h-6 w-6" aria-hidden="true">
-        <path
-          d="M16 4 L28 26 H22 L16 14 L10 26 H4 Z"
-          fill="var(--color-neon)"
-        />
-      </svg>
-      <span className="text-lg font-extrabold tracking-tight">creaty</span>
+    <a href="#top" className={`inline-flex items-center ${className}`}>
+      <img
+        src={creatyLogo}
+        alt="Creaty"
+        className="h-7 md:h-8 w-auto object-contain"
+      />
     </a>
   );
 }
