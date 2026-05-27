@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Creaty usa IA para ayudar a mentores y emprendedores a organizar información, hacer seguimiento y orientar cada mentoría con mayor precisión.",
       },
       { name: "author", content: "Creaty" },
-      { property: "og:title", content: "Creaty — Mentoría empresarial con IA" },
+      { property: "og:title", content: "Creaty — Mentorea con más claridad y menos trabajo operativo" },
       {
         property: "og:description",
         content:
@@ -87,6 +87,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Creaty — Mentorea con más claridad y menos trabajo operativo" },
+      { name: "description", content: "Creaty is an AI-powered platform for mentors and entrepreneurs to organize, track, and evolve business mentorships." },
+      { property: "og:description", content: "Creaty is an AI-powered platform for mentors and entrepreneurs to organize, track, and evolve business mentorships." },
+      { name: "twitter:description", content: "Creaty is an AI-powered platform for mentors and entrepreneurs to organize, track, and evolve business mentorships." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d0bb090d-98f2-4cf1-8f5c-4ea29470e162/id-preview-602619e2--67ed29f9-b718-4b5f-8278-e578d91ae5dc.lovable.app-1779847444217.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d0bb090d-98f2-4cf1-8f5c-4ea29470e162/id-preview-602619e2--67ed29f9-b718-4b5f-8278-e578d91ae5dc.lovable.app-1779847444217.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
