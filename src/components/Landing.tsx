@@ -320,39 +320,8 @@ function DashboardMockup() {
         </div>
       </motion.div>
 
-      {/* floating cards */}
-      {!reduce && (
-        <>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: [0, -10, 0] }}
-            transition={{ y: { duration: 5, repeat: Infinity, ease: "easeInOut" }, opacity: { duration: 0.6, delay: 1.3 } }}
-            className="hidden lg:block absolute -left-10 top-1/3 glass rounded-xl px-4 py-3"
-          >
-            <div className="flex items-center gap-2">
-              <Brain className="h-4 w-4 text-[var(--color-neon)]" />
-              <div>
-                <div className="text-[10px] text-[var(--color-muted-foreground)]">Insight detectado</div>
-                <div className="text-xs font-medium">3 emprendedores comparten bloqueo</div>
-              </div>
-            </div>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: [0, 8, 0] }}
-            transition={{ y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 0.5 }, opacity: { duration: 0.6, delay: 1.5 } }}
-            className="hidden lg:block absolute -right-8 top-2/3 glass rounded-xl px-4 py-3"
-          >
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-[var(--lilac)]" />
-              <div>
-                <div className="text-[10px] text-[var(--color-muted-foreground)]">Próxima mentoría</div>
-                <div className="text-xs font-medium">Ana · jueves 10:00</div>
-              </div>
-            </div>
-          </motion.div>
-        </>
-      )}
+
+
     </div>
   );
 }
