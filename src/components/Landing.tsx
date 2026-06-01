@@ -101,7 +101,7 @@ function Logo({ className = "" }: { className?: string }) {
       <img
         src={creatyLogo}
         alt="Creaty"
-        className="h-11 md:h-14 w-auto object-contain"
+        className="h-[74px] md:h-[86px] w-auto object-contain"
       />
     </a>
   );
