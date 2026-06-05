@@ -122,7 +122,7 @@ function Navbar() {
             <a href="#beneficios" className="hover:text-white transition">Beneficios</a>
           </nav>
           <NeonButton href="#waitlist" className="!py-2 !px-4 text-xs">
-            Únete a la lista
+            Solicitar acceso anticipado
             <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
           </NeonButton>
         </div>
@@ -355,8 +355,8 @@ function Hero() {
           className="mt-6 max-w-5xl text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]"
         >
           Mentorea con{" "}
-          <span className="text-[var(--color-neon)] text-glow-neon">más claridad</span>
-          <br className="hidden sm:block" /> y menos trabajo operativo.
+          <span className="text-[var(--color-neon)] text-glow-neon">más claridad.</span>{" "}
+          <br className="hidden sm:block" /> Tu siguiente gran mentor ya no trabaja solo.
         </motion.h1>
 
         <motion.p
@@ -365,8 +365,7 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mt-6 max-w-2xl text-balance text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed"
         >
-          Creaty usa inteligencia artificial para ayudarte a organizar la información,
-          hacer seguimiento a tus emprendedores y orientar cada mentoría con mayor precisión.
+          Diagnósticos, seguimiento y recomendaciones inteligentes para acompañar cada emprendimiento con más claridad, personalización e impacto real.
         </motion.p>
 
         <motion.div
@@ -376,7 +375,7 @@ function Hero() {
           className="mt-9 flex flex-col sm:flex-row items-center gap-3"
         >
           <NeonButton href="#waitlist">
-            Únete a la lista de espera
+            Solicitar acceso anticipado
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
           </NeonButton>
           <NeonButton href="#como" variant="ghost">
@@ -390,10 +389,30 @@ function Hero() {
           transition={{ delay: 0.5 }}
           className="mt-4 text-xs text-[var(--color-muted-foreground)]"
         >
-          Accede antes que nadie a Creaty y marca una diferencia como mentor.
+          Accede a la beta y marca diferencia en tus mentorías
         </motion.p>
 
-        <div className="mt-16 md:mt-24 w-full max-w-6xl">
+        <div className="mt-20 md:mt-28 w-full max-w-6xl">
+          <div className="text-center mb-10">
+            <motion.h3
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-2xl md:text-3xl font-bold tracking-tight"
+            >
+              Un solo lugar para entender qué está pasando con cada emprendimiento.
+            </motion.h3>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mt-4 max-w-2xl mx-auto text-base text-[var(--color-muted-foreground)] leading-relaxed"
+            >
+              Sin Creaty, la información vive en WhatsApp, en Excel, en correos y en tu memoria. Con Creaty, llega a cada sesión con el contexto completo.
+            </motion.p>
+          </div>
           <DashboardMockup />
         </div>
       </div>
@@ -408,37 +427,23 @@ function Problema() {
     {
       icon: Layers,
       title: "Información dispersa",
-      text: "Datos de tus emprendedores repartidos entre chats, hojas y memoria.",
-      span: "md:col-span-2",
+      text: "Notas en WhatsApp. Avances en Excel. Acuerdos en tu memoria. Todo en lugares distintos.",
+      span: "md:col-span-1",
       accent: "var(--orange-brand)",
     },
     {
       icon: MessagesSquare,
       title: "Seguimiento frágil",
-      text: "Depende de notas sueltas y conversaciones que se pierden.",
+      text: "Sin seguimiento constante, es difícil saber quién avanza y quién necesita ayuda urgente.",
       span: "md:col-span-1",
       accent: "var(--lilac)",
     },
     {
-      icon: ScanSearch,
-      title: "Sin visibilidad real",
-      text: "Es difícil saber el avance real de cada emprendimiento.",
+      icon: Clock,
+      title: "Cada sesión empieza de cero",
+      text: "Reconstruir el contexto de cada emprendedor consume tiempo que debería ir al acompañamiento.",
       span: "md:col-span-1",
       accent: "var(--color-neon)",
-    },
-    {
-      icon: Clock,
-      title: "Preparar mentorías toma demasiado",
-      text: "Repasar contexto antes de cada sesión consume tiempo valioso.",
-      span: "md:col-span-2",
-      accent: "var(--color-neon)",
-    },
-    {
-      icon: AlertTriangle,
-      title: "Menos espacio estratégico",
-      text: "Lo operativo te quita energía para aportar valor real.",
-      span: "md:col-span-3",
-      accent: "var(--orange-brand)",
     },
   ];
 
@@ -454,8 +459,18 @@ function Problema() {
           transition={{ duration: 0.6 }}
           className="mt-5 max-w-3xl text-balance text-3xl md:text-5xl font-bold tracking-tight"
         >
-          Lo que hoy hace difícil <span className="text-[var(--color-neon)]">mentorear bien</span>.
+          El problema no son las mentorías. Es todo lo que pasa entre una y otra.
         </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeUp}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mt-5 max-w-2xl text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed"
+        >
+          Lo complejo es hacer seguimiento, conectar información y saber qué priorizar con cada emprendimiento.
+        </motion.p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -505,26 +520,24 @@ function Solucion() {
             transition={{ duration: 0.6 }}
             className="mt-5 text-balance text-3xl md:text-5xl font-bold tracking-tight leading-[1.1]"
           >
-            Un sistema que <span className="text-[var(--color-neon)]">organiza</span> y{" "}
-            <span className="text-[var(--lilac)]">potencia</span> tu mentoría.
+            Todo lo que necesitas para un acompañamiento de verdad.
           </motion.h2>
           <p className="mt-6 text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed max-w-xl">
-            Creaty centraliza la información de tus emprendedores, automatiza el seguimiento
-            y genera recomendaciones personalizadas para cada mentoría.
+            Creaty no solo centraliza la información de tus emprendimientos. Lleva el registro de cada mentoría, los resúmenes, las tareas acordadas y los compromisos pendientes. Y con ayuda de la IA, analiza cada proceso para darte orientación real como mentor: qué está funcionando, qué necesita atención y cuál puede ser el mejor siguiente paso para cada emprendedor que acompañas.
           </p>
 
           <div className="mt-8 grid sm:grid-cols-2 gap-3">
             {[
-              { i: Layers, t: "Centralización de datos" },
-              { i: TrendingUp, t: "Seguimiento automático" },
-              { i: Brain, t: "Recomendaciones IA" },
-              { i: Target, t: "Decisiones estratégicas" },
+              { i: Layers, t: "Claridad sobre cada emprendedor, en todo momento — toda la información del proceso disponible antes de cada sesión." },
+              { i: TrendingUp, t: "Seguimiento sin perder contexto — resúmenes de sesiones, tareas acordadas y compromisos registrados." },
+              { i: Brain, t: "Recomendaciones de IA para cada mentoría — la IA analiza cada emprendimiento y sugiere qué priorizar, qué mejorar y qué viene después." },
+              { i: Target, t: "Más impacto. Mucho menos operación." },
             ].map((f) => (
               <div
                 key={f.t}
                 className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3"
               >
-                <f.i className="h-4 w-4 text-[var(--color-neon)]" />
+                <f.i className="h-4 w-4 text-[var(--color-neon)] shrink-0" />
                 <span className="text-sm">{f.t}</span>
               </div>
             ))}
@@ -608,22 +621,22 @@ function Como() {
     {
       n: "01",
       icon: Compass,
-      t: "Diagnóstico",
-      d: "Entiende tu forma de mentorear, el estado real de cada emprendimiento que acompañas y sus particularidades.",
+      t: "Entiende",
+      d: "Conoce mejor a cada emprendedor y el estado real de su proceso, sin tener que preguntar de nuevo.",
       color: "var(--color-neon)",
     },
     {
       n: "02",
       icon: ListChecks,
-      t: "Seguimiento",
-      d: "Registra avances y mantiene todo actualizado automáticamente.",
+      t: "Da seguimiento",
+      d: "Mantén claridad sobre avances, acuerdos y próximos pasos, sesión tras sesión.",
       color: "var(--lilac)",
     },
     {
       n: "03",
       icon: Lightbulb,
-      t: "Recomendaciones",
-      d: "Recibe sugerencias para orientar mejor cada mentoría.",
+      t: "Orienta",
+      d: "Recibe recomendaciones inteligentes para tomar mejores decisiones en cada mentoría.",
       color: "var(--orange-brand)",
     },
   ];
@@ -689,11 +702,11 @@ function Como() {
 
 function Beneficios() {
   const benefits = [
-    "Información clara y organizada en un solo lugar.",
-    "Seguimiento real sin depender de memoria o chats.",
-    "Mentorías mejor preparadas y más estratégicas.",
-    "Menos carga operativa en tu día a día.",
-    "Más impacto en cada emprendedor que acompañas.",
+    "Nunca vuelvas a buscar información en varios lugares",
+    "Llega a cada mentoría sabiendo exactamente dónde va el proceso",
+    "Detecta oportunidades antes de que se conviertan en problemas",
+    "Invierte tiempo en lo que realmente aporta valor",
+    "Ejecuta mentorías más personalizadas y efectivas",
   ];
   return (
     <Section id="beneficios">
@@ -708,11 +721,10 @@ function Beneficios() {
             transition={{ duration: 0.6 }}
             className="mt-5 text-balance text-3xl md:text-5xl font-bold tracking-tight leading-[1.1]"
           >
-            Lo que <span className="text-[var(--color-neon)]">cambia</span> para ti.
+            Vuelve a enfocarte en lo que te hace un gran mentor.
           </motion.h2>
           <p className="mt-5 text-[var(--color-muted-foreground)] leading-relaxed max-w-md">
-            Una práctica más enfocada, menos operativa y con mayor impacto medible
-            en los emprendedores que acompañas.
+            Menos tiempo organizando información. Más tiempo generando impacto real.
           </p>
         </div>
         <ul className="lg:col-span-3 space-y-3">
@@ -767,12 +779,10 @@ function Diferencial() {
           transition={{ duration: 0.6 }}
           className="mt-5 max-w-3xl text-balance text-3xl md:text-5xl font-bold tracking-tight"
         >
-          No es solo <span className="line-through decoration-[var(--orange-brand)]/70 decoration-[3px]">seguimiento</span>.
+          No es solo gestión de tareas.
         </motion.h2>
         <p className="mt-5 max-w-2xl text-[var(--color-muted-foreground)] leading-relaxed">
-          Creaty no es una hoja de cálculo ni un gestor de tareas. Es un sistema que entiende
-          el proceso emprendedor y te ayuda a tomar mejores decisiones en cada etapa
-          de las empresas que acompañas.
+          Creaty fue creada para acompañar a mentores y emprendedores a lo largo de todo el proceso. No para registrar datos. Para que el mentor pueda pensar, decidir y generar impacto.
         </p>
       </div>
 
@@ -825,19 +835,11 @@ function Diferencial() {
 /* ---------- Prueba social ---------- */
 
 function PruebaSocial() {
-  const stats = [
-    { v: "+120", l: "Mentores en lista de espera" },
-    { v: "15h", l: "Ahorro promedio / mes" },
-    { v: "3x", l: "Mayor claridad de avance" },
-    { v: "97%", l: "Recomendarían Creaty" },
-  ];
-  const logos = ["Endeavor", "Aceler.lab", "Impulsa", "Wayra Co", "Mentor+", "FoundersHub"];
-
   return (
     <Section>
       <div className="flex flex-col items-center text-center mb-12">
         <Eyebrow>Construido con experiencia</Eyebrow>
-        <motion.p
+        <motion.h2
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -845,88 +847,18 @@ function PruebaSocial() {
           transition={{ duration: 0.6 }}
           className="mt-5 max-w-3xl text-balance text-2xl md:text-3xl font-medium leading-snug text-[var(--color-foreground)]"
         >
-          Diseñado por personas con experiencia acompañando emprendedores y procesos
-          de <span className="text-[var(--color-neon)]">mentoría empresarial</span>.
+          Diseñado junto a mentores empresariales.
+        </motion.h2>
+        <motion.p
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="mt-5 max-w-2xl text-base text-[var(--color-muted-foreground)] leading-relaxed"
+        >
+          Estamos construyendo Creaty de la mano de quienes acompañan emprendedores todos los días. Sus decisiones, sus frustraciones y su experiencia están en cada detalle de la plataforma.
         </motion.p>
-      </div>
-
-      {/* logos */}
-      <div className="mx-auto grid grid-cols-3 md:grid-cols-6 gap-6 md:gap-10 items-center opacity-60 mb-16">
-        {logos.map((l) => (
-          <div
-            key={l}
-            className="text-center text-sm md:text-base font-semibold tracking-wide text-[var(--color-muted-foreground)] hover:text-white transition"
-          >
-            {l}
-          </div>
-        ))}
-      </div>
-
-      {/* stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-16">
-        {stats.map((s, i) => (
-          <motion.div
-            key={s.l}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.07 }}
-            className="glass rounded-2xl p-6 text-center"
-          >
-            <div className="text-3xl md:text-4xl font-bold text-[var(--color-neon)]">{s.v}</div>
-            <div className="mt-1 text-xs md:text-sm text-[var(--color-muted-foreground)]">{s.l}</div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* testimonios */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {[
-          {
-            n: "Camila Restrepo",
-            r: "Mentora · Aceleradora regional",
-            q: "Por fin tengo un solo lugar donde ver dónde está cada emprendedor sin volverme loca con chats.",
-            c: "var(--color-neon)",
-          },
-          {
-            n: "Andrés Quintero",
-            r: "Director de programa",
-            q: "Las recomendaciones de Creaty me ayudaron a enfocar mentorías que antes eran demasiado generales.",
-            c: "var(--lilac)",
-          },
-          {
-            n: "Valeria Ortiz",
-            r: "Mentora independiente",
-            q: "Preparar cada sesión ahora me toma minutos. Llego con claridad y agrego mucho más valor.",
-            c: "var(--orange-brand)",
-          },
-        ].map((t, i) => (
-          <motion.div
-            key={t.n}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: i * 0.08 }}
-            className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 hover:border-white/10 transition"
-          >
-            <Quote className="h-5 w-5 text-[var(--color-neon)]" />
-            <p className="mt-3 text-sm leading-relaxed text-[var(--color-foreground)]">
-              "{t.q}"
-            </p>
-            <div className="mt-5 flex items-center gap-3">
-              <div
-                className="h-9 w-9 rounded-full grid place-items-center text-xs font-bold text-black"
-                style={{ background: t.c }}
-              >
-                {t.n.split(" ").map((s) => s[0]).join("")}
-              </div>
-              <div>
-                <div className="text-sm font-medium">{t.n}</div>
-                <div className="text-[11px] text-[var(--color-muted-foreground)]">{t.r}</div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
       </div>
     </Section>
   );
@@ -968,18 +900,11 @@ function Waitlist() {
             transition={{ duration: 0.6 }}
             className="mt-5 text-balance text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]"
           >
-            Sé parte de los primeros mentores en usar{" "}
-            <span className="text-[var(--color-neon)] text-glow-neon">Creaty</span>.
+            Construyamos juntos la próxima generación de mentorías empresariales.
           </motion.h2>
           <p className="mt-6 text-[var(--color-muted-foreground)] leading-relaxed max-w-md">
-            Accede antes que nadie y sé parte de la construcción de una mejor forma
-            de acompañar emprendedores.
+            Accede antes que nadie. Prueba las primeras versiones y comparte tu experiencia para construir una herramienta hecha para mentores como tú.
           </p>
-
-          <div className="mt-8 flex items-center gap-3 text-sm text-[var(--color-muted-foreground)]">
-            <Users className="h-4 w-4 text-[var(--color-neon)]" />
-            <span>+120 mentores ya en la lista</span>
-          </div>
         </div>
 
         <motion.form
@@ -1025,14 +950,14 @@ function Waitlist() {
           </div>
 
           <NeonButton type="submit" className="w-full !py-4">
-            {submitting ? "Enviando..." : submitted ? "¡Estás dentro! ✓" : "Únete a la lista de espera"}
+            {submitting ? "Enviando..." : submitted ? "¡Estás dentro! ✓" : "Solicitar acceso anticipado"}
             {!submitting && !submitted && (
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             )}
           </NeonButton>
 
           <p className="text-center text-[11px] text-[var(--color-muted-foreground)]">
-            Sin spam. Solo te avisamos cuando Creaty esté listo para ti.
+            No estamos buscando usuarios. Estamos buscando mentores pioneros.
           </p>
         </motion.form>
       </div>
