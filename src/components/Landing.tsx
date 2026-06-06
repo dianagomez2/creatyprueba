@@ -1095,18 +1095,22 @@ function Footer() {
 /* ---------- Page ---------- */
 
 export default function Landing() {
+  const [modalOpen, setModalOpen] = useState(false);
   return (
-    <main className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased">
-      <Navbar />
-      <Hero />
-      <Problema />
-      <Solucion />
-      <Como />
-      <Beneficios />
-      <Diferencial />
-      <PruebaSocial />
-      <Waitlist />
-      <Footer />
-    </main>
+    <WaitlistModalContext.Provider value={{ open: () => setModalOpen(true) }}>
+      <main className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased">
+        <Navbar />
+        <Hero />
+        <Problema />
+        <Solucion />
+        <Como />
+        <Beneficios />
+        <Diferencial />
+        <PruebaSocial />
+        <WaitlistCTA />
+        <Footer />
+      </main>
+      <WaitlistModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+    </WaitlistModalContext.Provider>
   );
 }
