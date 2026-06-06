@@ -392,9 +392,6 @@ function Hero() {
             Solicitar acceso anticipado
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
           </NeonButton>
-          <NeonButton href="#como" variant="ghost">
-            Ver cómo funciona
-          </NeonButton>
         </motion.div>
 
         <motion.p
