@@ -877,7 +877,7 @@ function PruebaSocial() {
 
 /* ---------- Waitlist Form ---------- */
 
-function Waitlist() {
+function WaitlistForm({ onSuccess }: { onSuccess?: () => void }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -891,104 +891,155 @@ function Waitlist() {
         description: "Revisa tu correo para confirmar tu lugar.",
       });
       (e.target as HTMLFormElement).reset();
+      setTimeout(() => {
+        onSuccess?.();
+        setSubmitted(false);
+      }, 1500);
     }, 900);
   };
 
+  return (
+    <form onSubmit={onSubmit} className="space-y-5">
+      <Field label="Nombre completo" name="nombre" placeholder="María García" required />
+      <Field label="Correo" type="email" name="email" placeholder="maria@empresa.com" required />
+      <Field label="Celular" type="tel" name="celular" placeholder="+57 300 000 0000" required />
+
+      <div className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
+          ¿Acompañas emprendedores actualmente?
+        </label>
+        <div className="grid grid-cols-2 gap-2">
+          {["Sí", "No"].map((v) => (
+            <label
+              key={v}
+              className="cursor-pointer rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-center hover:border-[var(--color-neon)]/40 hover:bg-[var(--color-neon)]/5 transition has-[:checked]:border-[var(--color-neon)] has-[:checked]:bg-[var(--color-neon)]/10 has-[:checked]:text-[var(--color-neon)]"
+            >
+              <input type="radio" name="acompana" value={v} required className="sr-only" />
+              {v}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
+          ¿Qué es lo que más te cuesta hoy en tus mentorías?
+        </label>
+        <textarea
+          name="reto"
+          rows={4}
+          required
+          placeholder="Cuéntanos brevemente..."
+          className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm placeholder:text-[var(--color-muted-foreground)]/60 outline-none focus:border-[var(--color-neon)]/60 focus:bg-black/40 focus:shadow-[0_0_0_4px_rgba(229,254,0,0.08)] transition resize-none"
+        />
+      </div>
+
+      <button
+        type="submit"
+        className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--color-neon)] px-6 py-4 text-sm font-semibold text-[#10110e] transition-all duration-300 hover:shadow-[0_0_30px_rgba(229,254,0,0.5)] hover:-translate-y-0.5"
+      >
+        {submitting ? "Enviando..." : submitted ? "¡Estás dentro! ✓" : "Solicitar acceso anticipado"}
+        {!submitting && !submitted && (
+          <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+        )}
+      </button>
+    </form>
+  );
+}
+
+function WaitlistModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
+      <div
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in"
+        onClick={onClose}
+        aria-hidden
+      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto glass rounded-3xl p-6 md:p-8"
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar"
+          className="absolute top-4 right-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-[var(--color-muted-foreground)] hover:text-white hover:border-white/30 transition"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        <div className="mb-6 pr-10">
+          <Eyebrow>Lista de espera</Eyebrow>
+          <h3 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight leading-tight">
+            Solicita tu acceso anticipado
+          </h3>
+          <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
+            Cuéntanos sobre ti y te avisaremos cuando tengas acceso.
+          </p>
+        </div>
+        <WaitlistForm onSuccess={onClose} />
+      </motion.div>
+    </div>
+  );
+}
+
+function WaitlistCTA() {
   return (
     <Section id="waitlist" className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[800px] rounded-full bg-[var(--color-neon)]/10 blur-[140px]" />
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-        <div className="lg:sticky lg:top-32">
-          <Eyebrow>Lista de espera</Eyebrow>
-          <motion.h2
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            transition={{ duration: 0.6 }}
-            className="mt-5 text-balance text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]"
-          >
-            Construyamos juntos la próxima generación de mentorías empresariales.
-          </motion.h2>
-          <p className="mt-6 text-[var(--color-muted-foreground)] leading-relaxed max-w-md">
-            Accede antes que nadie. Prueba las primeras versiones y comparte tu experiencia para construir una herramienta hecha para mentores como tú.
-          </p>
+      <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
+        <Eyebrow>Acceso anticipado</Eyebrow>
+        <motion.h2
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          transition={{ duration: 0.6 }}
+          className="mt-5 text-balance text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]"
+        >
+          Construyamos juntos la próxima generación de mentorías empresariales.
+        </motion.h2>
+        <p className="mt-6 text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed max-w-2xl">
+          Accede antes que nadie. Prueba las primeras versiones y comparte tu experiencia para construir una herramienta hecha para mentores como tú.
+        </p>
+
+        <div className="mt-10">
+          <NeonButton href="#waitlist" className="!px-8 !py-4 text-base">
+            Solicitar acceso anticipado
+            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+          </NeonButton>
         </div>
 
-        <motion.form
-          onSubmit={onSubmit}
-          initial={{ opacity: 0, y: 30 }}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="glass rounded-3xl p-6 md:p-8 space-y-5"
+          transition={{ duration: 0.7, delay: 0.15 }}
+          className="mt-10 max-w-2xl text-balance italic font-medium text-xl md:text-2xl leading-snug text-[var(--color-neon)] text-glow-neon"
         >
-          <Field label="Nombre completo" name="nombre" placeholder="María García" required />
-          <Field label="Correo" type="email" name="email" placeholder="maria@empresa.com" required />
-          <Field label="Celular" type="tel" name="celular" placeholder="+57 300 000 0000" required />
-
-          <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
-              ¿Acompañas emprendedores actualmente?
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {["Sí", "No"].map((v) => (
-                <label
-                  key={v}
-                  className="cursor-pointer rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-center hover:border-[var(--color-neon)]/40 hover:bg-[var(--color-neon)]/5 transition has-[:checked]:border-[var(--color-neon)] has-[:checked]:bg-[var(--color-neon)]/10 has-[:checked]:text-[var(--color-neon)]"
-                >
-                  <input type="radio" name="acompana" value={v} required className="sr-only" />
-                  {v}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
-              ¿Qué es lo que más te cuesta hoy en tus mentorías?
-            </label>
-            <textarea
-              name="reto"
-              rows={4}
-              required
-              placeholder="Cuéntanos brevemente..."
-              className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm placeholder:text-[var(--color-muted-foreground)]/60 outline-none focus:border-[var(--color-neon)]/60 focus:bg-black/40 focus:shadow-[0_0_0_4px_rgba(229,254,0,0.08)] transition resize-none"
-            />
-          </div>
-
-          <NeonButton type="submit" className="w-full !py-4">
-            {submitting ? "Enviando..." : submitted ? "¡Estás dentro! ✓" : "Solicitar acceso anticipado"}
-            {!submitting && !submitted && (
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-            )}
-          </NeonButton>
-
-          <p className="text-center text-[11px] text-[var(--color-muted-foreground)]">
-            No estamos buscando usuarios. Estamos buscando mentores pioneros.
-          </p>
-        </motion.form>
+          “No estamos buscando usuarios. Estamos buscando mentores pioneros.”
+        </motion.p>
       </div>
     </Section>
   );
 }
-
-function Field({
-  label,
-  name,
-  type = "text",
-  placeholder,
-  required,
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  placeholder?: string;
-  required?: boolean;
-}) {
   return (
     <div className="space-y-2">
       <label htmlFor={name} className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
