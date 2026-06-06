@@ -60,19 +60,24 @@ function Eyebrow({ children }: { children: ReactNode }) {
   );
 }
 
+const WaitlistModalContext = createContext<{ open: () => void }>({ open: () => {} });
+
 function NeonButton({
   children,
   variant = "primary",
   href,
   type = "button",
   className = "",
+  onClick,
 }: {
   children: ReactNode;
   variant?: "primary" | "ghost";
   href?: string;
   type?: "button" | "submit";
   className?: string;
+  onClick?: () => void;
 }) {
+  const { open } = useContext(WaitlistModalContext);
   const base =
     "group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300";
   const styles =
@@ -80,6 +85,15 @@ function NeonButton({
       ? "bg-[var(--color-neon)] text-[#10110e] hover:shadow-[0_0_30px_rgba(229,254,0,0.5)] hover:-translate-y-0.5"
       : "border border-white/10 text-[var(--color-foreground)] hover:bg-white/[0.04] hover:border-white/20";
   const cls = `${base} ${styles} ${className}`;
+
+  // Intercept #waitlist links → open modal instead of navigating
+  if (href === "#waitlist") {
+    return (
+      <button type="button" onClick={open} className={cls}>
+        {children}
+      </button>
+    );
+  }
   if (href)
     return (
       <a href={href} className={cls}>
@@ -87,7 +101,7 @@ function NeonButton({
       </a>
     );
   return (
-    <button type={type} className={cls}>
+    <button type={type} onClick={onClick} className={cls}>
       {children}
     </button>
   );
