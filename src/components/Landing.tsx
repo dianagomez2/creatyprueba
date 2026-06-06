@@ -1040,6 +1040,19 @@ function WaitlistCTA() {
     </Section>
   );
 }
+function Field({
+  label,
+  name,
+  type = "text",
+  placeholder,
+  required,
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+}) {
   return (
     <div className="space-y-2">
       <label htmlFor={name} className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
