@@ -379,9 +379,9 @@ function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="mt-6 max-w-5xl text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]"
+          className="mt-6 max-w-5xl text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-white"
         >
-          Conviértete en el mentor que cada emprendedor necesita.
+          Conviértete en el <span style={{ color: "#CCFF00" }}>mentor</span> que cada emprendedor necesita.
         </motion.h1>
 
         <motion.p
