@@ -368,9 +368,7 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="mt-6 max-w-5xl text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]"
         >
-          Mentorea con{" "}
-          <span className="text-[var(--color-neon)] text-glow-neon">más claridad.</span>{" "}
-          <br className="hidden sm:block" /> Tu siguiente gran mentor ya no trabaja solo.
+          Conviértete en el mentor que cada emprendedor necesita.
         </motion.h1>
 
         <motion.p
