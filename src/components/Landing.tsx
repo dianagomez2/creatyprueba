@@ -124,10 +124,23 @@ function Logo({ className = "" }: { className?: string }) {
 /* ---------- Navbar ---------- */
 
 function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   return (
-    <header className="fixed top-0 inset-x-0 z-50">
-      <div className="mx-auto mt-4 max-w-6xl px-4">
-        <div className="glass flex items-center justify-between rounded-2xl px-4 md:px-5 py-3">
+    <header
+      className={`fixed top-0 inset-x-0 z-[100] transition-all duration-300 ${
+        scrolled
+          ? "bg-[#10110e]/85 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.4)] border-b border-white/5"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="mx-auto max-w-6xl px-4 py-3">
+        <div className="flex items-center justify-between">
           <Logo />
           <nav className="hidden md:flex items-center gap-8 text-sm text-[var(--color-muted-foreground)]">
             <a href="#problema" className="hover:text-white transition">Problema</a>
