@@ -1,1127 +1,136 @@
-import { useState, useContext, createContext, useEffect, type ReactNode } from "react";
-import creatyLogo from "@/assets/creaty-logo.png";
+import { createContext, useContext, useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import {
-  ArrowRight,
-  Sparkles,
-  Brain,
-  Compass,
-  LineChart,
-  Layers,
-  MessagesSquare,
-  Calendar,
-  AlertTriangle,
-  ScanSearch,
-  ListChecks,
-  Lightbulb,
-  Check,
-  X,
-  ChevronRight,
-  Quote,
-  Users,
-  TrendingUp,
-  Clock,
-  Target,
+  AlertTriangle, ArrowLeft, ArrowRight, Bell, BrainCircuit, CalendarDays, Check,
+  ChevronRight, ClipboardCheck, FileText, LayoutDashboard, Lightbulb, ListChecks,
+  Menu, MessageSquareText, Search, Sparkles, Target, Users, X,
 } from "lucide-react";
 import { toast } from "sonner";
+import creatyLogo from "@/assets/creaty-logo.png";
+import { supabase } from "@/integrations/supabase/client";
 
-/* ---------- shared bits ---------- */
+const WaitlistContext = createContext<{ open: () => void }>({ open: () => undefined });
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-};
-
-function Section({
-  id,
-  children,
-  className = "",
-}: {
-  id?: string;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <section
-      id={id}
-      className={`relative w-full px-6 md:px-10 lg:px-16 py-24 md:py-32 ${className}`}
-    >
-      <div className="mx-auto max-w-7xl">{children}</div>
-    </section>
-  );
+function Section({ id, light = false, children, className = "" }: { id?: string; light?: boolean; children: ReactNode; className?: string }) {
+  return <section id={id} className={`${light ? "bg-creaty-cream text-creaty-black" : "bg-creaty-black text-creaty-cream"} relative w-full px-5 py-20 md:px-10 md:py-28 lg:px-16 ${className}`}><div className="mx-auto max-w-7xl">{children}</div></section>;
 }
 
-function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <div className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border)] bg-white/[0.02] px-3 py-1.5 text-xs font-medium tracking-wider uppercase text-[var(--color-muted-foreground)]">
-      <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-neon)] shadow-[0_0_12px_var(--color-neon)]" />
-      {children}
-    </div>
-  );
+function CTAButton({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const { open } = useContext(WaitlistContext);
+  return <button type="button" onClick={open} className={`inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-creaty-lime px-6 py-3 text-sm font-bold text-creaty-black shadow-[var(--shadow-cta)] transition duration-300 hover:-translate-y-0.5 hover:brightness-105 ${className}`}>{children}<ArrowRight className="h-4 w-4" /></button>;
 }
 
-const WaitlistModalContext = createContext<{ open: () => void }>({ open: () => {} });
-
-function NeonButton({
-  children,
-  variant = "primary",
-  href,
-  type = "button",
-  className = "",
-  onClick,
-}: {
-  children: ReactNode;
-  variant?: "primary" | "ghost";
-  href?: string;
-  type?: "button" | "submit";
-  className?: string;
-  onClick?: () => void;
-}) {
-  const { open } = useContext(WaitlistModalContext);
-  const base =
-    "group inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300";
-  const styles =
-    variant === "primary"
-      ? "bg-[var(--color-neon)] text-[#10110e] hover:shadow-[0_0_30px_rgba(229,254,0,0.5)] hover:-translate-y-0.5"
-      : "border border-white/10 text-[var(--color-foreground)] hover:bg-white/[0.04] hover:border-white/20";
-  const cls = `${base} ${styles} ${className}`;
-
-  // Intercept #waitlist links → open modal instead of navigating
-  if (href === "#waitlist") {
-    return (
-      <button type="button" onClick={open} className={cls}>
-        {children}
-      </button>
-    );
-  }
-  if (href)
-    return (
-      <a href={href} className={cls}>
-        {children}
-      </a>
-    );
-  return (
-    <button type={type} onClick={onClick} className={cls}>
-      {children}
-    </button>
-  );
+function Logo({ compact = false }: { compact?: boolean }) {
+  return <a href="#top" aria-label="Ir al inicio" className="inline-flex shrink-0 items-center"><img src={creatyLogo} alt="Creaty" className={`${compact ? "h-11 md:h-14" : "h-14 md:h-[72px]"} w-auto object-contain`} /></a>;
 }
-
-/* ---------- Logo ---------- */
-
-function Logo({ className = "" }: { className?: string }) {
-  return (
-    <a href="#top" className={`inline-flex items-center ${className}`}>
-      <img
-        src={creatyLogo}
-        alt="Creaty"
-        className="h-[74px] md:h-[86px] w-auto object-contain"
-      />
-    </a>
-  );
-}
-
-/* ---------- Navbar ---------- */
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const update = () => setScrolled(window.scrollY > 80);
+    update(); window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
   }, []);
-  return (
-    <header
-      className={`fixed top-0 inset-x-0 z-[100] transition-all duration-300 ${
-        scrolled
-          ? "bg-[#10110e]/85 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.4)] border-b border-white/5"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto max-w-6xl px-4 py-3">
-        <div className="flex items-center justify-between">
-          <Logo />
-          <nav className="hidden md:flex items-center gap-8 text-sm text-[var(--color-muted-foreground)]">
-            <a href="#problema" className="hover:text-white transition">Problema</a>
-            <a href="#solucion" className="hover:text-white transition">Solución</a>
-            <a href="#como" className="hover:text-white transition">Cómo funciona</a>
-            <a href="#beneficios" className="hover:text-white transition">Beneficios</a>
-          </nav>
-          <NeonButton href="#waitlist" className="!py-2 !px-4 text-xs">
-            Solicitar acceso anticipado
-            <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-          </NeonButton>
-        </div>
-      </div>
-    </header>
-  );
+  const links = [["Por qué Creaty", "#problema"], ["Cómo te ayuda", "#solucion"], ["Cómo funciona", "#como-funciona"], ["Por qué es diferente", "#diferencial"]];
+  return <header className={`fixed inset-x-0 top-0 z-[100] border-b transition-all duration-300 ${scrolled || menuOpen ? "border-creaty-cream/10 bg-creaty-black/95 shadow-[var(--shadow-nav)] backdrop-blur-xl" : "border-transparent bg-transparent"}`}>
+    <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 md:px-8">
+      <Logo compact />
+      <nav className="hidden items-center gap-7 lg:flex">{links.map(([label, href]) => <a key={href} href={href} className="text-sm font-medium text-creaty-cream/65 transition hover:text-creaty-cream">{label}</a>)}</nav>
+      <div className="ml-auto flex items-center gap-2"><CTAButton className="min-h-10 px-3 py-2 text-[11px] sm:px-4 sm:text-xs">Regístrate ahora</CTAButton><button type="button" aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} className="grid h-10 w-10 place-items-center rounded-md border border-creaty-cream/15 text-creaty-cream lg:hidden">{menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button></div>
+    </div>
+    {menuOpen && <nav className="border-t border-creaty-cream/10 bg-creaty-black px-5 py-4 lg:hidden">{links.map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)} className="block border-b border-creaty-cream/10 py-3 text-sm text-creaty-cream/80 last:border-0">{label}</a>)}</nav>}
+  </header>;
 }
 
-/* ---------- Hero Dashboard mockup ---------- */
+const ventures = [
+  ["AR", "Ana Rivera", "EdTech", "hace 2 días", "En progreso", "bg-creaty-purple"],
+  ["DC", "Diego Castro", "HealthTech", "hace 5 días", "Bloqueo atención", "bg-creaty-orange"],
+  ["SM", "Sara Morales", "AgroTech", "hace 1 día", "En progreso", "bg-creaty-lime"],
+  ["JL", "Juan López", "EdTech", "hace 14 días", "En pausa", "bg-creaty-cream"],
+  ["CT", "Camila Torres", "Marketplace", "hace 3 días", "En progreso", "bg-creaty-purple"],
+  ["LV", "Laura Vélez", "Sustainability", "hace 4 días", "En progreso", "bg-creaty-orange"],
+];
+const stages = [["Idea y validación", 100], ["Validación de problema", 80], ["Pricing y modelo de negocio", 40], ["MVP y primeras ventas", 20], ["Tracción y escalamiento", 0]] as const;
+
+function Avatar({ initials, tone = "bg-creaty-purple" }: { initials: string; tone?: string }) { return <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${tone} text-[10px] font-extrabold text-creaty-black`}>{initials}</span>; }
+function SearchBox({ label }: { label: string }) { return <div className="flex items-center gap-2 rounded-md border border-creaty-black/10 bg-background px-3 py-2 text-[10px] text-creaty-black/40"><Search className="h-3.5 w-3.5" />{label}</div>; }
 
 function DashboardMockup() {
-  const reduce = useReducedMotion();
-  return (
-    <div className="relative">
-      {/* glow */}
-      <div className="pointer-events-none absolute -inset-10 -z-10">
-        <div className="absolute left-1/2 top-1/2 h-[420px] w-[680px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-neon)]/20 blur-[120px]" />
+  return <div className="relative mt-12 md:mt-16">
+    <div className="mock-note -left-8 top-36">Lista de emprendimientos con estado y última actualización<span>↘</span></div>
+    <div className="mock-note -right-8 top-28">Métricas clave de un vistazo<span>↙</span></div>
+    <div className="mock-note -right-10 top-[52%]">Permite identificar rápidamente quién necesita tu atención<span>↙</span></div>
+    <div className="mock-note -left-5 bottom-24">Próximos pasos más relevantes<span>↗</span></div>
+    <div className="mock-note -right-5 bottom-36">Progreso visual del emprendimiento o del portafolio<span>↖</span></div>
+    <div className="relative z-10 overflow-hidden rounded-lg border border-creaty-black/10 bg-background shadow-[var(--shadow-panel)]">
+      <div className="flex h-14 items-center gap-3 border-b border-creaty-black/10 px-3 md:px-5"><span className="text-base font-black">Creaty<span className="text-creaty-orange">.</span></span><div className="ml-auto hidden w-48 sm:block"><SearchBox label="Buscar..." /></div><Bell className="h-4 w-4"/><Avatar initials="AP" tone="bg-creaty-lime" /></div>
+      <div className="grid md:grid-cols-[150px_250px_1fr]">
+        <aside className="hidden min-h-[720px] flex-col border-r border-creaty-black/10 p-3 md:flex">
+          {[LayoutDashboard, Users, CalendarDays, ListChecks, FileText].map((Icon, i) => <div key={i} className={`mb-1 flex items-center gap-2 rounded-md px-3 py-2 text-[10px] font-semibold ${i === 0 ? "bg-creaty-lime/35" : "text-creaty-black/55"}`}><Icon className="h-3.5 w-3.5" />{["Inicio", "Mis emprendimientos", "Calendario", "Tareas", "Recursos"][i]}</div>)}
+          <div className="mt-auto flex items-center gap-2 border-t border-creaty-black/10 pt-3"><Avatar initials="AP" tone="bg-creaty-purple"/><span className="text-[9px]"><b>Alejandro Pérez</b><br/>Mentor</span></div>
+        </aside>
+        <div className="border-r border-creaty-black/10 p-3 md:p-4"><div className="mb-3 text-xs font-bold">Mis emprendimientos (8)</div><SearchBox label="Buscar emprendimiento..."/><div className="mt-3 grid gap-2 sm:grid-cols-2 md:grid-cols-1">{ventures.map(([initials,name,sector,last,status,tone]) => <div key={name} className="flex min-w-0 items-center gap-2 rounded-md border border-creaty-black/8 p-2"><Avatar initials={initials} tone={tone}/><div className="min-w-0 flex-1"><div className="truncate text-[10px] font-bold">{name}</div><div className="text-[8px] text-creaty-black/50">{sector} · Últ. sesión: {last}</div></div><span className={`rounded-full px-1.5 py-1 text-[7px] font-bold ${status === "Bloqueo atención" ? "bg-danger-soft text-danger" : status === "En pausa" ? "bg-creaty-black/8 text-creaty-black/50" : "bg-success-soft text-success"}`}>{status}</span></div>)}</div></div>
+        <main className="min-w-0 p-3 md:p-4">
+          <div className="no-scrollbar -mx-3 flex gap-2 overflow-x-auto px-3 pb-2 md:mx-0 md:grid md:grid-cols-4 md:px-0">{[["Emprendimientos activos","8","↑2 vs. semana anterior"],["Sesiones esta semana","5","↑1 vs. semana anterior"],["Requieren atención","2","↓1 vs. semana anterior"],["Avance promedio","68%","↑12% vs. mes anterior"]].map(([l,v,d],i)=><div key={l} className="min-w-[145px] rounded-md border border-creaty-black/10 p-3"><div className="flex items-center justify-between text-[8px] text-creaty-black/50">{l}{i===2&&<AlertTriangle className="h-3 w-3 text-danger"/>}</div><div className="mt-1 text-xl font-black">{v}</div><div className={`text-[7px] ${i===2?"text-danger":"text-success"}`}>{d}</div></div>)}</div>
+          <div className="mt-3 grid gap-3 lg:grid-cols-[1.15fr_.85fr]">
+            <div className="rounded-md bg-creaty-black p-4 text-creaty-cream"><div className="text-[9px] uppercase text-creaty-lime">Tu próxima mentoría</div><div className="mt-1 text-[10px] font-semibold">Jueves, 10 de abril · 10:00 a. m.</div><div className="mt-3 flex items-center gap-2"><Avatar initials="AR"/><div className="text-[10px]"><b>Ana Rivera</b><br/><span className="text-creaty-cream/50">EdTech</span></div><button className="ml-auto rounded-md bg-creaty-lime px-2 py-1.5 text-[8px] font-bold text-creaty-black">Ver detalle →</button></div><div className="mt-4 text-[9px] font-bold">Resumen para tu sesión</div><p className="mt-1 text-[8px] leading-relaxed text-creaty-cream/65">Ha avanzado en la validación de problema. El pricing continúa pendiente. Ha entrevistado a 8 usuarios y validado la propuesta de valor.</p><div className="mt-3 rounded-md bg-creaty-purple/20 p-2 text-[8px]"><Sparkles className="mr-1 inline h-3 w-3 text-creaty-purple"/><b>Foco sugerido por IA:</b> Validar disposición a pagar y explorar modelos de pricing.</div></div>
+            <div className="rounded-md border border-creaty-black/10 p-4"><div className="flex items-center justify-between text-[10px] font-bold">Avance por etapa <span className="rounded border px-2 py-1 text-[8px] font-normal">Todos</span></div><div className="mt-4 space-y-3">{stages.map(([label,p])=><div key={label}><div className="flex justify-between text-[8px]"><span>{label}</span><b>{p}%</b></div><div className="mt-1 h-1.5 rounded-full bg-creaty-black/8"><div className={`h-full rounded-full ${p===40?"bg-creaty-orange":"bg-progress"}`} style={{width:`${p}%`}}/></div></div>)}</div></div>
+          </div>
+          <div className="mt-3"><div className="mb-2 flex justify-between text-[10px] font-bold">Próximos pasos de tu portafolio <span className="text-[8px] font-medium">Ver todas las tareas →</span></div><div className="grid gap-2 sm:grid-cols-3">{[["Ana Rivera","Validar pricing","10 abr"],["Diego Castro","Entrevistas usuarios","12 abr"],["Sara Morales","Preparar pitch","13 abr"]].map(([n,t,d])=><div key={n} className="rounded-md border border-creaty-black/10 p-2 text-[8px]"><b>{n}</b><div className="mt-1 text-creaty-black/55">{t}</div><span className="mt-2 inline-block rounded bg-creaty-lime/45 px-1.5 py-0.5 font-bold">{d}</span></div>)}</div></div>
+        </main>
       </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-        className="glass rounded-2xl p-3 md:p-4 shadow-[0_30px_120px_-20px_rgba(0,0,0,0.6)]"
-      >
-        {/* top bar */}
-        <div className="flex items-center justify-between rounded-xl bg-black/40 px-4 py-2.5 border border-white/5">
-          <div className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-            <span className="h-2.5 w-2.5 rounded-full bg-white/15" />
-          </div>
-          <div className="text-[11px] text-[var(--color-muted-foreground)] font-mono">
-            creaty.app / dashboard
-          </div>
-          <div className="text-[11px] text-[var(--color-neon)] font-medium">● live</div>
-        </div>
-
-        <div className="grid grid-cols-12 gap-3 mt-3">
-          {/* sidebar */}
-          <div className="hidden md:flex col-span-3 flex-col gap-2 rounded-xl bg-white/[0.02] border border-white/5 p-3">
-            <div className="text-[10px] uppercase tracking-wider text-[var(--color-muted-foreground)] px-2">
-              Emprendedores
-            </div>
-            {[
-              { n: "Ana Rivera", t: "Foodtech", p: 78, color: "var(--color-neon)" },
-              { n: "Luis Méndez", t: "Edtech", p: 42, color: "var(--lilac)" },
-              { n: "María Soto", t: "Fintech", p: 61, color: "var(--color-neon)" },
-              { n: "Diego Paz", t: "Retail", p: 24, color: "var(--orange-brand)" },
-              { n: "Sara León", t: "SaaS", p: 89, color: "var(--color-neon)" },
-            ].map((e, i) => (
-              <motion.div
-                key={e.n}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6 + i * 0.08 }}
-                className="flex items-center gap-2 rounded-lg px-2 py-2 hover:bg-white/[0.03] transition"
-              >
-                <div
-                  className="h-7 w-7 rounded-full grid place-items-center text-[10px] font-bold text-black"
-                  style={{ background: e.color }}
-                >
-                  {e.n.split(" ").map((s) => s[0]).join("")}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium truncate">{e.n}</div>
-                  <div className="text-[10px] text-[var(--color-muted-foreground)]">{e.t}</div>
-                </div>
-                <div className="text-[10px] font-mono text-[var(--color-muted-foreground)]">
-                  {e.p}%
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* main */}
-          <div className="col-span-12 md:col-span-9 grid gap-3">
-            {/* metrics */}
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { l: "Emprendedores activos", v: "24", d: "+3 este mes", c: "var(--color-neon)" },
-                { l: "Mentorías esta semana", v: "12", d: "8 completas", c: "var(--lilac)" },
-                { l: "Avance promedio", v: "68%", d: "+12 pts", c: "var(--orange-brand)" },
-              ].map((m, i) => (
-                <motion.div
-                  key={m.l}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + i * 0.1 }}
-                  className="rounded-xl border border-white/5 bg-black/30 p-3"
-                >
-                  <div className="text-[10px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                    {m.l}
-                  </div>
-                  <div className="mt-1 flex items-baseline gap-2">
-                    <span className="text-2xl font-bold" style={{ color: m.c }}>
-                      {m.v}
-                    </span>
-                    <span className="text-[10px] text-[var(--color-muted-foreground)]">{m.d}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* AI insight + chart */}
-            <div className="grid grid-cols-5 gap-3">
-              {/* AI insight */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.9 }}
-                className="col-span-5 md:col-span-3 rounded-xl border border-[var(--color-neon)]/20 bg-gradient-to-br from-[var(--color-neon)]/10 via-transparent to-transparent p-4"
-              >
-                <div className="flex items-center gap-2 text-[var(--color-neon)] text-xs font-semibold">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Recomendación IA
-                </div>
-                <p className="mt-2 text-sm leading-snug text-[var(--color-foreground)]">
-                  <span className="text-[var(--color-neon)] font-semibold">Ana</span> avanzó
-                  validación de problema pero está estancada en pricing. Sugerencia:{" "}
-                  <span className="font-medium">sesión enfocada en willingness-to-pay</span>{" "}
-                  con plantilla 3 hipótesis.
-                </p>
-                <div className="mt-3 flex items-center gap-2 text-[10px] text-[var(--color-muted-foreground)]">
-                  <span className="rounded-md bg-white/5 px-2 py-1">Próxima sesión: jue 10am</span>
-                  <span className="rounded-md bg-white/5 px-2 py-1">Plantilla lista</span>
-                </div>
-              </motion.div>
-
-              {/* chart */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.05 }}
-                className="col-span-5 md:col-span-2 rounded-xl border border-white/5 bg-black/30 p-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="text-[10px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                    Avance portfolio
-                  </div>
-                  <div className="text-[10px] text-[var(--color-neon)]">+18%</div>
-                </div>
-                <svg viewBox="0 0 200 80" className="mt-2 w-full h-20">
-                  <defs>
-                    <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stopColor="#e5fe00" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#e5fe00" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d="M0,60 L25,55 L50,45 L75,50 L100,35 L125,30 L150,25 L175,18 L200,12 L200,80 L0,80 Z"
-                    fill="url(#g1)"
-                  />
-                  <path
-                    d="M0,60 L25,55 L50,45 L75,50 L100,35 L125,30 L150,25 L175,18 L200,12"
-                    stroke="#e5fe00"
-                    strokeWidth="1.5"
-                    fill="none"
-                  />
-                </svg>
-              </motion.div>
-            </div>
-
-            {/* next steps row */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 }}
-              className="rounded-xl border border-white/5 bg-black/30 p-3"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-[11px] uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                  Próximos pasos sugeridos
-                </div>
-                <div className="text-[10px] text-[var(--color-muted-foreground)]">IA · hoy</div>
-              </div>
-              <div className="grid md:grid-cols-3 gap-2">
-                {[
-                  { t: "Ana → validar pricing", c: "var(--color-neon)" },
-                  { t: "Diego → entrevistas usuario", c: "var(--orange-brand)" },
-                  { t: "Sara → preparar pitch ronda", c: "var(--lilac)" },
-                ].map((s) => (
-                  <div
-                    key={s.t}
-                    className="flex items-center gap-2 rounded-lg bg-white/[0.02] border border-white/5 px-3 py-2"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: s.c }} />
-                    <span className="text-xs">{s.t}</span>
-                    <ChevronRight className="ml-auto h-3 w-3 text-[var(--color-muted-foreground)]" />
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
-
-
-
     </div>
-  );
+    <div className="mt-5 flex flex-wrap gap-2 md:hidden">{["Lista y estado", "Atención prioritaria", "Métricas clave", "Progreso visual", "Próximos pasos"].map((x,i)=><span key={x} className="rounded-full border border-creaty-black/15 bg-background px-3 py-1.5 text-[10px] font-semibold">{i+1}. {x}</span>)}</div>
+  </div>;
 }
-
-/* ---------- Hero ---------- */
 
 function Hero() {
-  return (
-    <Section id="top" className="!pt-40 !pb-20 md:!pb-32 overflow-hidden">
-      {/* background */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 grid-bg radial-fade opacity-50" />
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[500px] w-[900px] rounded-full bg-[var(--color-neon)]/15 blur-[160px]" />
-        <div className="absolute bottom-0 left-0 h-[300px] w-[400px] rounded-full bg-[var(--lilac)]/10 blur-[140px]" />
-        <div className="absolute top-1/3 right-0 h-[260px] w-[400px] rounded-full bg-[var(--orange-brand)]/8 blur-[140px]" />
-      </div>
-
-      <div className="relative flex flex-col items-center text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Eyebrow>Mentoría empresarial · Powered by AI</Eyebrow>
-        </motion.div>
-
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="mt-6 max-w-5xl text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-white"
-        >
-          Conviértete en el <span style={{ color: "#CCFF00" }}>mentor</span> que cada emprendedor necesita.
-        </motion.h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mt-6 max-w-2xl text-balance text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed"
-        >
-          Diagnósticos, seguimiento y recomendaciones inteligentes para acompañar cada emprendimiento con más claridad, personalización e impacto real.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="mt-9 flex flex-col sm:flex-row items-center gap-3"
-        >
-          <NeonButton href="#waitlist">
-            Solicitar acceso anticipado
-            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-          </NeonButton>
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-4 text-xs text-[var(--color-muted-foreground)]"
-        >
-          Accede a la beta y marca diferencia en tus mentorías
-        </motion.p>
-
-        <div className="mt-20 md:mt-28 w-full max-w-6xl">
-          <div className="text-center mb-10">
-            <motion.h3
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-2xl md:text-3xl font-bold tracking-tight"
-            >
-              Un solo lugar para entender qué está pasando con cada emprendimiento.
-            </motion.h3>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="mt-4 max-w-2xl mx-auto text-base text-[var(--color-muted-foreground)] leading-relaxed"
-            >
-              Sin Creaty, la información vive en WhatsApp, en Excel, en correos y en tu memoria. Con Creaty, llega a cada sesión con el contexto completo.
-            </motion.p>
-          </div>
-          <DashboardMockup />
-        </div>
-      </div>
-    </Section>
-  );
+  const reduce = useReducedMotion();
+  return <section id="top" className="relative flex min-h-[780px] items-center overflow-hidden bg-creaty-black px-5 pb-24 pt-36 text-creaty-cream md:min-h-[860px] md:px-10 md:pt-44"><div className="hero-grid absolute inset-0 opacity-40"/><div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-creaty-lime/50 to-transparent"/><motion.div initial={reduce?false:{opacity:0,y:28}} animate={{opacity:1,y:0}} transition={{duration:.8}} className="relative mx-auto max-w-5xl text-center"><h1 className="text-balance text-[clamp(2.7rem,7vw,6.8rem)] font-black leading-[.98] tracking-normal">Más emprendimientos acompañados. <span className="text-creaty-lime">Menos tiempo</span> preparando cada mentoría.</h1><p className="mx-auto mt-7 max-w-3xl text-base leading-relaxed text-creaty-cream/70 md:text-xl">Creaty centraliza los avances de tus emprendedores y te ayuda a llegar a cada sesión con el contexto y los próximos pasos claros, para que dediques tu tiempo a aportar valor.</p><div className="mt-9 flex flex-col items-center"><CTAButton>Regístrate ahora</CTAButton><span className="mt-3 text-xs text-creaty-cream/45">Y recibe gratis un diagnóstico como mentor para iniciar</span></div></motion.div></section>;
 }
 
-/* ---------- Problema (bento) ---------- */
+function DashboardSection(){return <Section light><div className="mx-auto max-w-4xl text-center"><p className="text-xs font-bold uppercase text-creaty-orange">Un solo lugar para acompañar mejor</p><h2 className="mt-4 text-balance text-3xl font-black leading-tight md:text-5xl">Todo lo que necesitas saber antes de tu próxima mentoría.</h2><p className="mx-auto mt-5 max-w-2xl text-creaty-black/60">Avances, acuerdos, próximos pasos y recomendaciones de cada emprendimiento, organizados en un solo lugar.</p></div><h3 className="mx-auto mt-16 max-w-3xl text-center text-2xl font-extrabold md:text-4xl">Llega con contexto. Empieza aportando valor desde el primer minuto.</h3><DashboardMockup/></Section>}
 
-function Problema() {
-  const items = [
-    {
-      icon: Layers,
-      title: "Información dispersa",
-      text: "Notas en WhatsApp. Avances en Excel. Acuerdos en tu memoria. Todo en lugares distintos.",
-      span: "md:col-span-1",
-      accent: "var(--orange-brand)",
-    },
-    {
-      icon: MessagesSquare,
-      title: "Seguimiento frágil",
-      text: "Sin seguimiento constante, es difícil saber quién avanza y quién necesita ayuda urgente.",
-      span: "md:col-span-1",
-      accent: "var(--lilac)",
-    },
-    {
-      icon: Clock,
-      title: "Cada sesión empieza de cero",
-      text: "Reconstruir el contexto de cada emprendedor consume tiempo que debería ir al acompañamiento.",
-      span: "md:col-span-1",
-      accent: "var(--color-neon)",
-    },
-  ];
+const problems = [
+["Llegas a la sesión sin recordar todo el contexto.","Antes de cada mentoría tienes que revisar conversaciones, avances y sesiones anteriores para volver a entender dónde está cada emprendimiento."],
+["No sabes si avanzaron hasta que vuelves a verlos.","Entre una sesión y otra pierdes visibilidad sobre tareas, compromisos y bloqueos. Cuando algo se estanca, te enteras tarde."],
+["No todos los emprendedores necesitan la misma mentoría.","Cada equipo está en un momento distinto, con retos y prioridades diferentes. Adaptar el acompañamiento a cada caso exige contexto y criterio."],
+["Termina la mentoría, pero los próximos pasos no quedan claros y organizados.","En sesiones presenciales o virtuales, convertir lo conversado en tareas, responsables y próximos pasos claros termina siendo otro trabajo después de mentorear."],
+];
+function Problema(){return <Section id="problema"><div className="max-w-4xl"><p className="text-xs font-bold uppercase text-creaty-orange">Por qué Creaty</p><h2 className="mt-4 text-balance text-3xl font-black md:text-5xl">Tu tiempo debería estar dedicado a mentorear, no reconstruyendo lo que pasó.</h2><p className="mt-5 max-w-2xl text-creaty-cream/60">Entre una sesión y otra, el contexto se dispersa, los compromisos se enfrían y preparar cada caso vuelve a consumir tiempo.</p></div><div className="mt-12 grid gap-px overflow-hidden rounded-lg border border-creaty-cream/10 bg-creaty-cream/10 md:grid-cols-2">{problems.map(([t,d],i)=><article key={t} className="bg-creaty-black p-6 md:p-8"><span className={`text-4xl font-black ${i%2?"text-creaty-purple":"text-creaty-orange"}`}>0{i+1}</span><h3 className="mt-5 text-lg font-bold">{t}</h3><p className="mt-3 text-sm leading-relaxed text-creaty-cream/55">{d}</p></article>)}</div><div className="mt-12 flex flex-col items-start justify-between gap-5 border-t border-creaty-cream/10 pt-8 md:flex-row md:items-center"><p className="max-w-xl font-semibold">Descubre qué puedes mejorar en tu forma de acompañar y recibe gratis tu diagnóstico como mentor.</p><CTAButton>Haz tu diagnóstico gratis</CTAButton></div></Section>}
 
-  return (
-    <Section id="problema">
-      <div className="flex flex-col items-center text-center mb-14">
-        <Eyebrow>El problema</Eyebrow>
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          transition={{ duration: 0.6 }}
-          className="mt-5 max-w-3xl text-balance text-3xl md:text-5xl font-bold tracking-tight"
-        >
-          El problema no son las mentorías. Es todo lo que pasa entre una y otra.
-        </motion.h2>
-        <motion.p
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={fadeUp}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-5 max-w-2xl text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed"
-        >
-          Lo complejo es hacer seguimiento, conectar información y saber qué priorizar con cada emprendimiento.
-        </motion.p>
-      </div>
+const values = [
+[LayersIcon,"Todo el contexto, en un solo lugar.","Avances, acuerdos y decisiones de cada emprendimiento, listos antes de tu próxima mentoría.","bg-creaty-lime"],
+[ListChecks,"Seguimiento que continúa entre sesiones.","Mantén visibles los avances, compromisos y bloqueos sin esperar hasta la próxima mentoría.","bg-creaty-purple"],
+[BrainCircuit,"Orientación para cada emprendimiento.","Creaty, a través de IA, conecta la etapa, los avances y las necesidades de cada equipo para ayudarte a identificar dónde enfocarte.","bg-creaty-orange"],
+[MessageSquareText,"De la conversación a la acción.","Convierte lo trabajado en la sesión en tareas, responsables y próximos pasos claros para el equipo.","bg-creaty-black text-creaty-lime"],
+] as const;
+function LayersIcon(props:{className?:string}){return <LayoutDashboard {...props}/>}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {items.map((it, i) => (
-          <motion.div
-            key={it.title}
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, delay: i * 0.05 }}
-            className={`group relative overflow-hidden rounded-2xl border border-white/5 bg-gradient-to-br from-white/[0.03] to-transparent p-6 hover:border-white/10 transition ${it.span}`}
-          >
-            <div
-              className="absolute -top-12 -right-12 h-40 w-40 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-500 blur-3xl"
-              style={{ background: it.accent }}
-            />
-            <div
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-black/40"
-              style={{ color: it.accent }}
-            >
-              <it.icon className="h-5 w-5" />
-            </div>
-            <h3 className="mt-5 text-lg font-semibold">{it.title}</h3>
-            <p className="mt-2 text-sm text-[var(--color-muted-foreground)] leading-relaxed">
-              {it.text}
-            </p>
-          </motion.div>
-        ))}
-      </div>
-    </Section>
-  );
-}
+const processStages = [["Idea y validación","100%"],["Validación de problema","100%"],["Propuesta de valor","80%"],["Pricing y modelo de negocio","En progreso · 40%"],["MVP y primeras ventas","20%"],["Tracción y escalamiento","0%"]];
+function ProcessMap(){return <div className="relative mt-16"><div className="mock-note -left-8 top-16">Información general del emprendimiento<span>↘</span></div><div className="mock-note -right-8 top-36">Bloqueo identificado de forma clara<span>↙</span></div><div className="mock-note -right-5 bottom-16">Siguiente paso sugerido por IA<span>↖</span></div><div className="mock-note -left-5 bottom-10">Etapas del proceso con progreso claro<span>↗</span></div>
+<div className="relative z-10 rounded-lg border border-creaty-black/10 bg-background p-4 shadow-[var(--shadow-panel)] md:p-7"><div className="flex flex-col gap-4 border-b border-creaty-black/10 pb-5 lg:flex-row lg:items-end"><div className="flex items-start gap-3"><ArrowLeft className="mt-1 h-4 w-4"/><div><h3 className="text-xl font-black">Ana Rivera</h3><p className="text-xs text-creaty-black/45">EdTech · Educación personalizada con IA</p></div></div><div className="no-scrollbar flex gap-5 overflow-x-auto lg:ml-auto">{["Resumen","Sesiones","Tareas","Documentos","Notas"].map((x,i)=><span key={x} className={`shrink-0 pb-2 text-[10px] font-semibold ${i===0?"border-b-4 border-creaty-lime":"text-creaty-black/45"}`}>{x}</span>)}</div></div>
+<div className="mt-5 grid gap-3 lg:grid-cols-[1.35fr_.8fr_.8fr]"><div className="grid rounded-md border border-creaty-black/10 p-5 sm:grid-cols-[1fr_110px]"><div><p className="text-[10px] text-creaty-black/45">Etapa actual</p><h4 className="mt-2 text-lg font-black">Validación comercial</h4><p className="mt-2 text-xs leading-relaxed text-creaty-black/50">Está validando la disposición a pagar y explorando modelos de negocio.</p></div><div className="mt-4 border-creaty-black/10 sm:mt-0 sm:border-l sm:pl-5"><p className="text-[10px] text-creaty-black/45">Avance general</p><div className="mt-3 grid h-20 w-20 place-items-center rounded-full bg-[conic-gradient(var(--creaty-progress)_60%,var(--creaty-track)_0)]"><div className="grid h-14 w-14 place-items-center rounded-full bg-background text-lg font-black">60%</div></div></div></div><div className="rounded-md bg-danger-soft p-5 text-danger"><AlertTriangle className="h-5 w-5"/><h4 className="mt-3 text-sm font-bold">Bloqueo detectado</h4><p className="mt-2 text-[10px] leading-relaxed">Aún no ha validado la disposición a pagar con usuarios reales.</p></div><div className="rounded-md bg-lime-soft p-5"><Lightbulb className="h-5 w-5"/><h4 className="mt-3 text-sm font-bold">Próximo foco sugerido por IA</h4><p className="mt-2 text-[10px] leading-relaxed">Diseñar 3 hipótesis de pricing y validarlas con 5 clientes potenciales.</p></div></div>
+<div className="mt-4 rounded-md border border-creaty-black/10 p-5"><p className="text-xs font-bold">Mapa de proceso</p><div className="process-stepper mt-6">{processStages.map(([name,status],i)=><div key={name} className="process-step"><span className={`process-number ${i<3?"done":i===3?"current":"future"}`}>{i+1}</span><div><div className="text-[9px] font-semibold leading-tight">{name}</div><div className={`mt-1 flex items-center gap-1 text-[8px] font-bold ${i===3?"text-creaty-orange":i<3?"text-success":"text-creaty-black/35"}`}>{i<3?<Check className="h-3 w-3"/>:<span className="h-2 w-2 rounded-full border currentColor"/>}{status}</div></div></div>)}</div></div></div>
+<div className="mt-5 flex flex-wrap gap-2 md:hidden">{["Información general", "Etapas y progreso", "Bloqueo identificado", "Siguiente paso de IA"].map((x,i)=><span key={x} className="rounded-full border border-creaty-black/15 bg-background px-3 py-1.5 text-[10px] font-semibold">{i+1}. {x}</span>)}</div></div>}
 
-/* ---------- Solución ---------- */
+function Solucion(){return <Section id="solucion" light><div className="mx-auto max-w-4xl text-center"><p className="text-xs font-bold uppercase text-creaty-orange">Todo lo que necesitas para un acompañamiento de verdad</p><h2 className="mt-4 text-balance text-3xl font-black md:text-5xl">Tu experiencia hace la mentoría. Creaty hace que llegues preparado.</h2><p className="mx-auto mt-5 max-w-3xl text-creaty-black/60">Con Creaty conectas lo que ocurrió, lo que avanzó y lo que debería seguir para que tú puedas concentrarte en preguntar, analizar y orientar a tus emprendedores.</p></div><div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{values.map(([Icon,t,d,c])=><article key={t} className="rounded-lg border border-creaty-black/10 bg-background p-5"><div className={`grid h-11 w-11 place-items-center rounded-md ${c}`}><Icon className="h-5 w-5"/></div><h3 className="mt-5 font-extrabold">{t}</h3><p className="mt-3 text-sm leading-relaxed text-creaty-black/55">{d}</p></article>)}</div><ProcessMap/></Section>}
 
-function Solucion() {
-  return (
-    <Section id="solucion">
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-        <div>
-          <Eyebrow>La solución</Eyebrow>
-          <motion.h2
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeUp}
-            transition={{ duration: 0.6 }}
-            className="mt-5 text-balance text-3xl md:text-5xl font-bold tracking-tight leading-[1.1]"
-          >
-            Todo lo que necesitas para un acompañamiento de verdad.
-          </motion.h2>
-          <p className="mt-6 text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed max-w-xl">
-            Creaty no solo centraliza la información de tus emprendimientos. Lleva el registro de cada mentoría, los resúmenes, las tareas acordadas y los compromisos pendientes. Y con ayuda de la IA, analiza cada proceso para darte orientación real como mentor: qué está funcionando, qué necesita atención y cuál puede ser el mejor siguiente paso para cada emprendedor que acompañas.
-          </p>
+function Como(){const steps=[["01","Prepárate","Entiende dónde está cada emprendimiento y qué necesita atención antes de comenzar."],["02","Acompaña","Captura lo importante de la sesión y convierte acuerdos en tareas, responsables y próximos pasos claros."],["03","Da continuidad","Haz seguimiento a los avances y llega a la siguiente sesión sabiendo qué cambió y dónde aportar."]];return <Section id="como-funciona"><p className="text-xs font-bold uppercase text-creaty-purple">Tres pasos. Una mentoría más inteligente.</p><h2 className="mt-4 max-w-4xl text-balance text-3xl font-black md:text-5xl">Antes. Durante. Después. Sin perder el hilo.</h2><div className="mt-12 grid gap-3 md:grid-cols-3">{steps.map(([n,t,d],i)=><article key={n} className="rounded-lg border border-creaty-cream/10 p-6"><span className={`text-6xl font-black ${i===1?"text-creaty-orange":"text-creaty-lime"}`}>{n}</span><h3 className="mt-8 text-xl font-bold">{t}</h3><p className="mt-3 text-sm leading-relaxed text-creaty-cream/55">{d}</p></article>)}</div><div className="mt-12 flex flex-col items-start justify-between gap-5 border-t border-creaty-cream/10 pt-8 md:flex-row md:items-center"><p className="max-w-xl font-semibold">Descubre cómo Creaty puede ayudarte a preparar, acompañar y dar seguimiento a tus emprendedores.</p><CTAButton>Haz tu diagnóstico gratis</CTAButton></div></Section>}
 
-          <div className="mt-8 grid sm:grid-cols-2 gap-3">
-            {[
-              { i: Layers, t: "Claridad sobre cada emprendedor, en todo momento — toda la información del proceso disponible antes de cada sesión." },
-              { i: TrendingUp, t: "Seguimiento sin perder contexto — resúmenes de sesiones, tareas acordadas y compromisos registrados." },
-              { i: Brain, t: "Recomendaciones de IA para cada mentoría — la IA analiza cada emprendimiento y sugiere qué priorizar, qué mejorar y qué viene después." },
-              { i: Target, t: "Más impacto. Mucho menos operación." },
-            ].map((f) => (
-              <div
-                key={f.t}
-                className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.02] px-4 py-3"
-              >
-                <f.i className="h-4 w-4 text-[var(--color-neon)] shrink-0" />
-                <span className="text-sm">{f.t}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+function Diferencial(){return <Section id="diferencial" light><p className="text-xs font-bold uppercase text-creaty-orange">No es solo gestión de tareas</p><h2 className="mt-4 max-w-5xl text-balance text-3xl font-black md:text-5xl">Tus herramientas guardan información. Creaty te ayuda a convertirla en una mejor mentoría.</h2><div className="mt-12 grid overflow-hidden rounded-lg border border-creaty-black/10 lg:grid-cols-2"><div className="bg-background p-6 md:p-9"><p className="text-xs font-bold uppercase text-creaty-black/40">Otras herramientas</p><div className="mt-7 space-y-3">{["Notion","Excel","CRM","Agenda de notas","Otros"].map(x=><div key={x} className="flex items-center gap-3 border-b border-creaty-black/8 pb-3 text-sm"><X className="h-4 w-4 text-creaty-orange"/>{x}</div>)}</div><p className="mt-8 text-lg font-bold">Tú organizas, interpretas y decides qué sigue.</p></div><div className="bg-creaty-black p-6 text-creaty-cream md:p-9"><p className="text-xs font-bold uppercase text-creaty-lime">Con Creaty</p><div className="mt-7 flex min-h-48 items-center"><p className="text-balance text-2xl font-black leading-snug md:text-4xl">Mantiene contexto, conecta avances y te ayuda a preparar el siguiente paso.</p></div><div className="mt-5 h-2 w-full rounded-full bg-creaty-cream/10"><div className="h-full w-4/5 rounded-full bg-creaty-lime"/></div></div></div></Section>}
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
-          className="relative"
-        >
-          <div className="absolute -inset-8 -z-10 bg-[var(--color-neon)]/10 blur-3xl rounded-full" />
-          <div className="glass rounded-2xl p-6">
-            <div className="flex items-center justify-between">
-              <div className="text-xs uppercase tracking-wider text-[var(--color-muted-foreground)]">
-                Mapa de proceso · Ana Rivera
-              </div>
-              <div className="text-xs text-[var(--color-neon)]">78%</div>
-            </div>
-            <div className="mt-5 space-y-3">
-              {[
-                { l: "Idea & validación", p: 100, done: true },
-                { l: "Validación de problema", p: 100, done: true },
-                { l: "Pricing & willingness-to-pay", p: 65, active: true },
-                { l: "MVP & primeros usuarios", p: 30 },
-                { l: "Tracción & métricas", p: 0 },
-              ].map((s, i) => (
-                <div key={i} className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs">
-                    <span
-                      className={
-                        s.active
-                          ? "text-[var(--color-neon)] font-medium"
-                          : s.done
-                          ? "text-[var(--color-foreground)]"
-                          : "text-[var(--color-muted-foreground)]"
-                      }
-                    >
-                      {s.done && "✓ "}{s.l}
-                    </span>
-                    <span className="font-mono text-[var(--color-muted-foreground)]">{s.p}%</span>
-                  </div>
-                  <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${s.p}%`,
-                        background: s.active
-                          ? "linear-gradient(90deg, var(--color-neon), #b8cc00)"
-                          : s.done
-                          ? "rgba(229,254,0,0.4)"
-                          : "rgba(255,255,255,0.15)",
-                        boxShadow: s.active ? "0 0 12px rgba(229,254,0,0.5)" : undefined,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 rounded-xl border border-[var(--color-neon)]/20 bg-[var(--color-neon)]/5 p-4">
-              <div className="flex items-center gap-2 text-xs text-[var(--color-neon)] font-semibold">
-                <Sparkles className="h-3.5 w-3.5" /> Próxima acción sugerida
-              </div>
-              <p className="mt-1.5 text-sm">
-                Diseñar 3 hipótesis de pricing con plantilla y validar en 5 entrevistas esta semana.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </Section>
-  );
-}
+function Credibility(){return <Section light className="!pt-8"><div className="rounded-lg bg-creaty-purple/25 px-6 py-14 md:px-12"><div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-center"><div className="grid h-16 w-16 place-items-center rounded-full bg-creaty-purple"><Users className="h-7 w-7"/></div><div><p className="text-xs font-bold uppercase text-creaty-black/50">Diseñado junto a mentores empresariales</p><h2 className="mt-3 text-balance text-3xl font-black md:text-5xl">Construido con quienes saben lo que significa acompañar emprendedores.</h2><p className="mt-5 max-w-4xl text-creaty-black/60">Estamos desarrollando Creaty junto a mentores empresariales para convertir problemas reales de tu día a día en una herramienta que realmente ahorra tiempo y mejore tu acompañamiento.</p></div></div></div></Section>}
 
-/* ---------- Cómo funciona ---------- */
+function FinalCTA(){return <Section><div className="mx-auto max-w-4xl text-center"><Target className="mx-auto h-10 w-10 text-creaty-orange"/><h2 className="mt-6 text-balance text-4xl font-black md:text-6xl">Tu siguiente mentoría empieza mucho antes de la sesión.</h2><p className="mx-auto mt-6 max-w-3xl text-creaty-cream/65">Regístrate, recibe gratis tu diagnóstico como mentor y sé de los primeros en conocer cómo Creaty puede ayudarte a acompañar más emprendimientos dedicando menos tiempo operativo a preparar cada sesión.</p><div className="mt-9"><CTAButton>Regístrate ahora</CTAButton></div></div></Section>}
 
-function Como() {
-  const steps = [
-    {
-      n: "01",
-      icon: Compass,
-      t: "Entiende",
-      d: "Conoce mejor a cada emprendedor y el estado real de su proceso, sin tener que preguntar de nuevo.",
-      color: "var(--color-neon)",
-    },
-    {
-      n: "02",
-      icon: ListChecks,
-      t: "Da seguimiento",
-      d: "Mantén claridad sobre avances, acuerdos y próximos pasos, sesión tras sesión.",
-      color: "var(--lilac)",
-    },
-    {
-      n: "03",
-      icon: Lightbulb,
-      t: "Orienta",
-      d: "Recibe recomendaciones inteligentes para tomar mejores decisiones en cada mentoría.",
-      color: "var(--orange-brand)",
-    },
-  ];
+const fieldClass="mt-2 min-h-11 w-full rounded-md border border-creaty-black/15 bg-background px-3 py-2 text-sm text-creaty-black outline-none transition focus:border-creaty-black focus:ring-2 focus:ring-creaty-lime";
+function Field({label,name,type="text"}:{label:string;name:string;type?:string}){return <label className="block text-sm font-semibold">{label}<input className={fieldClass} name={name} type={type} required/></label>}
+function SelectField({label,name,options}:{label:string;name:string;options:string[]}){return <label className="block text-sm font-semibold">{label}<select className={fieldClass} name={name} required defaultValue=""><option value="" disabled>Selecciona una opción</option>{options.map(x=><option key={x}>{x}</option>)}</select></label>}
+function WaitlistForm({onSuccess}:{onSuccess:()=>void}){const [sending,setSending]=useState(false);async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();setSending(true);const data=Object.fromEntries(new FormData(e.currentTarget));const {error}=await supabase.from("mentor_waitlist").insert({name:String(data.name),email:String(data.email),phone:String(data.phone),simultaneous_ventures:String(data.simultaneous_ventures),mentorship_mode:String(data.mentorship_mode),professional_role:String(data.professional_role)});setSending(false);if(error){toast.error("No pudimos completar tu registro. Inténtalo de nuevo.");return}toast.success("Gracias por registrarte. Pronto recibirás noticias de Creaty.");onSuccess()}
+return <form onSubmit={submit} className="space-y-4"><div className="grid gap-4 sm:grid-cols-2"><Field label="Nombre" name="name"/><Field label="Correo" name="email" type="email"/><Field label="Celular" name="phone" type="tel"/><SelectField label="¿Cuántos emprendimientos acompañas usualmente en simultáneo?" name="simultaneous_ventures" options={["1-5","6-10","11-15","Más de 15"]}/></div><SelectField label="¿Cómo realizas principalmente tus mentorías?" name="mentorship_mode" options={["Por cuenta propia","A través de una incubadora, aceleradora o programa","Como parte de una red de mentores","Desde una empresa de consultoría o mentoría","Otro"]}/><SelectField label="¿Qué lugar ocupa la mentoría en tu actividad profesional?" name="professional_role" options={["Es mi actividad principal","Es una actividad complementaria frecuente","Mentoreo ocasionalmente"]}/><button disabled={sending} type="submit" className="flex min-h-12 w-full items-center justify-center rounded-md bg-creaty-lime px-5 font-bold text-creaty-black transition hover:brightness-105 disabled:opacity-60">{sending?"Enviando...":"Quiero mi diagnóstico gratis"}</button></form>}
+function WaitlistModal({open,onClose}:{open:boolean;onClose:()=>void}){useEffect(()=>{if(!open)return;const key=(e:KeyboardEvent)=>e.key==="Escape"&&onClose();document.addEventListener("keydown",key);document.body.style.overflow="hidden";return()=>{document.removeEventListener("keydown",key);document.body.style.overflow=""}},[open,onClose]);if(!open)return null;return <div role="dialog" aria-modal="true" aria-labelledby="modal-title" onMouseDown={e=>e.target===e.currentTarget&&onClose()} className="fixed inset-0 z-[200] grid place-items-center bg-creaty-black/85 p-3 backdrop-blur-sm"><div className="relative max-h-[94vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-creaty-cream p-5 text-creaty-black shadow-[var(--shadow-modal)] md:p-8"><button type="button" onClick={onClose} aria-label="Cerrar formulario" className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-creaty-black/15"><X className="h-5 w-5"/></button><p className="text-xs font-bold uppercase text-creaty-orange">Creaty para mentores</p><h2 id="modal-title" className="mt-3 pr-12 text-2xl font-black md:text-4xl">Empieza conociendo cómo mentoreas.</h2><p className="mb-7 mt-3 text-sm leading-relaxed text-creaty-black/60">Regístrate para ser de los primeros en probar Creaty y recibe gratis un diagnóstico de tu perfil como mentor.</p><WaitlistForm onSuccess={onClose}/></div></div>}
+function Footer(){return <footer className="border-t border-creaty-cream/10 bg-creaty-black px-5 py-8 text-creaty-cream"><div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row"><Logo compact/><span className="text-xs text-creaty-cream/40">© 2026 Creaty. Mentorías con más contexto.</span></div></footer>}
 
-  return (
-    <Section id="como" className="relative">
-      <div className="absolute inset-0 -z-10 grid-bg radial-fade opacity-30" />
-      <div className="flex flex-col items-center text-center mb-16">
-        <Eyebrow>Cómo funciona</Eyebrow>
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          transition={{ duration: 0.6 }}
-          className="mt-5 max-w-3xl text-balance text-3xl md:text-5xl font-bold tracking-tight"
-        >
-          Tres pasos. Una mentoría más inteligente.
-        </motion.h2>
-      </div>
-
-      <div className="relative grid md:grid-cols-3 gap-6 md:gap-4">
-        {/* connector */}
-        <div className="hidden md:block absolute top-16 left-[16%] right-[16%] h-px neon-divider" />
-
-        {steps.map((s, i) => (
-          <motion.div
-            key={s.n}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, delay: i * 0.15 }}
-            className="relative glass rounded-2xl p-7 hover:border-white/15 transition group"
-          >
-            <div
-              className="absolute -top-px left-8 right-8 h-px opacity-0 group-hover:opacity-100 transition"
-              style={{ background: `linear-gradient(90deg, transparent, ${s.color}, transparent)` }}
-            />
-            <div className="flex items-start justify-between">
-              <div
-                className="text-5xl font-extrabold leading-none tracking-tighter opacity-90"
-                style={{ color: s.color }}
-              >
-                {s.n}
-              </div>
-              <div
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border"
-                style={{ borderColor: `${s.color}40`, color: s.color, background: `${s.color}10` }}
-              >
-                <s.icon className="h-5 w-5" />
-              </div>
-            </div>
-            <h3 className="mt-6 text-xl font-semibold">{s.t}</h3>
-            <p className="mt-2 text-sm text-[var(--color-muted-foreground)] leading-relaxed">{s.d}</p>
-          </motion.div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- Beneficios ---------- */
-
-function Beneficios() {
-  const benefits = [
-    "Nunca vuelvas a buscar información en varios lugares",
-    "Llega a cada mentoría sabiendo exactamente dónde va el proceso",
-    "Detecta oportunidades antes de que se conviertan en problemas",
-    "Invierte tiempo en lo que realmente aporta valor",
-    "Ejecuta mentorías más personalizadas y efectivas",
-  ];
-  return (
-    <Section id="beneficios">
-      <div className="grid lg:grid-cols-5 gap-12 items-start">
-        <div className="lg:col-span-2">
-          <Eyebrow>Beneficios</Eyebrow>
-          <motion.h2
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            transition={{ duration: 0.6 }}
-            className="mt-5 text-balance text-3xl md:text-5xl font-bold tracking-tight leading-[1.1]"
-          >
-            Vuelve a enfocarte en lo que te hace un gran mentor.
-          </motion.h2>
-          <p className="mt-5 text-[var(--color-muted-foreground)] leading-relaxed max-w-md">
-            Menos tiempo organizando información. Más tiempo generando impacto real.
-          </p>
-        </div>
-        <ul className="lg:col-span-3 space-y-3">
-          {benefits.map((b, i) => (
-            <motion.li
-              key={b}
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.5, delay: i * 0.07 }}
-              className="group flex items-start gap-4 rounded-2xl border border-white/5 bg-white/[0.02] p-5 hover:bg-white/[0.04] hover:border-white/10 transition"
-            >
-              <div className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--color-neon)] text-[#10110e] shadow-[0_0_18px_rgba(229,254,0,0.45)]">
-                <Check className="h-4 w-4" strokeWidth={3} />
-              </div>
-              <span className="text-lg md:text-xl font-medium leading-snug">{b}</span>
-            </motion.li>
-          ))}
-        </ul>
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- Diferencial ---------- */
-
-function Diferencial() {
-  const others = [
-    "Solo almacena datos",
-    "Necesita actualizarlo manualmente",
-    "Estructura genérica de tareas",
-    "Sin contexto del proceso emprendedor",
-    "Te deja con más trabajo operativo",
-  ];
-  const ours = [
-    "Entiende el proceso emprendedor",
-    "Se actualiza automáticamente",
-    "Adaptado a cada etapa de la empresa",
-    "Recomendaciones contextualizadas con IA",
-    "Te libera para aportar valor estratégico",
-  ];
-
-  return (
-    <Section id="diferencial">
-      <div className="flex flex-col items-center text-center mb-14">
-        <Eyebrow>Diferencial</Eyebrow>
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          transition={{ duration: 0.6 }}
-          className="mt-5 max-w-3xl text-balance text-3xl md:text-5xl font-bold tracking-tight"
-        >
-          No es solo gestión de tareas.
-        </motion.h2>
-        <p className="mt-5 max-w-2xl text-[var(--color-muted-foreground)] leading-relaxed">
-          Creaty fue creada para acompañar a mentores y emprendedores a lo largo de todo el proceso. No para registrar datos. Para que el mentor pueda pensar, decidir y generar impacto.
-        </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="rounded-2xl border border-white/5 bg-white/[0.015] p-7"
-        >
-          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-[var(--color-muted-foreground)]">
-            Otros sistemas
-          </div>
-          <div className="mt-5 space-y-3">
-            {others.map((o) => (
-              <div key={o} className="flex items-start gap-3 text-sm text-[var(--color-muted-foreground)]">
-                <X className="h-4 w-4 mt-0.5 text-[var(--orange-brand)] shrink-0" />
-                {o}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative rounded-2xl border border-[var(--color-neon)]/25 bg-gradient-to-br from-[var(--color-neon)]/8 via-transparent to-transparent p-7 overflow-hidden"
-        >
-          <div className="absolute -top-16 -right-16 h-48 w-48 rounded-full bg-[var(--color-neon)]/15 blur-3xl" />
-          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-[var(--color-neon)] relative">
-            <Sparkles className="h-3.5 w-3.5" /> Creaty
-          </div>
-          <div className="mt-5 space-y-3 relative">
-            {ours.map((o) => (
-              <div key={o} className="flex items-start gap-3 text-sm font-medium">
-                <Check className="h-4 w-4 mt-0.5 text-[var(--color-neon)] shrink-0" strokeWidth={3} />
-                {o}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- Prueba social ---------- */
-
-function PruebaSocial() {
-  return (
-    <Section>
-      <div className="flex flex-col items-center text-center mb-12">
-        <Eyebrow>Construido con experiencia</Eyebrow>
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          transition={{ duration: 0.6 }}
-          className="mt-5 max-w-3xl text-balance text-2xl md:text-3xl font-medium leading-snug text-[var(--color-foreground)]"
-        >
-          Diseñado junto a mentores empresariales.
-        </motion.h2>
-        <motion.p
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mt-5 max-w-2xl text-base text-[var(--color-muted-foreground)] leading-relaxed"
-        >
-          Estamos construyendo Creaty de la mano de quienes acompañan emprendedores todos los días. Sus decisiones, sus frustraciones y su experiencia están en cada detalle de la plataforma.
-        </motion.p>
-      </div>
-    </Section>
-  );
-}
-
-/* ---------- Waitlist Form ---------- */
-
-function WaitlistForm({ onSuccess }: { onSuccess?: () => void }) {
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      setSubmitted(true);
-      toast.success("¡Estás dentro! Te avisaremos pronto.", {
-        description: "Revisa tu correo para confirmar tu lugar.",
-      });
-      (e.target as HTMLFormElement).reset();
-      setTimeout(() => {
-        onSuccess?.();
-        setSubmitted(false);
-      }, 1500);
-    }, 900);
-  };
-
-  return (
-    <form onSubmit={onSubmit} className="space-y-5">
-      <Field label="Nombre completo" name="nombre" placeholder="María García" required />
-      <Field label="Correo" type="email" name="email" placeholder="maria@empresa.com" required />
-      <Field label="Celular" type="tel" name="celular" placeholder="+57 300 000 0000" required />
-
-      <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
-          ¿Acompañas emprendedores actualmente?
-        </label>
-        <div className="grid grid-cols-2 gap-2">
-          {["Sí", "No"].map((v) => (
-            <label
-              key={v}
-              className="cursor-pointer rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-center hover:border-[var(--color-neon)]/40 hover:bg-[var(--color-neon)]/5 transition has-[:checked]:border-[var(--color-neon)] has-[:checked]:bg-[var(--color-neon)]/10 has-[:checked]:text-[var(--color-neon)]"
-            >
-              <input type="radio" name="acompana" value={v} required className="sr-only" />
-              {v}
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
-          ¿Qué es lo que más te cuesta hoy en tus mentorías?
-        </label>
-        <textarea
-          name="reto"
-          rows={4}
-          required
-          placeholder="Cuéntanos brevemente..."
-          className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm placeholder:text-[var(--color-muted-foreground)]/60 outline-none focus:border-[var(--color-neon)]/60 focus:bg-black/40 focus:shadow-[0_0_0_4px_rgba(229,254,0,0.08)] transition resize-none"
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--color-neon)] px-6 py-4 text-sm font-semibold text-[#10110e] transition-all duration-300 hover:shadow-[0_0_30px_rgba(229,254,0,0.5)] hover:-translate-y-0.5"
-      >
-        {submitting ? "Enviando..." : submitted ? "¡Estás dentro! ✓" : "Solicitar acceso anticipado"}
-        {!submitting && !submitted && (
-          <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-        )}
-      </button>
-    </form>
-  );
-}
-
-function WaitlistModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6">
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in"
-        onClick={onClose}
-        aria-hidden
-      />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 w-full max-w-lg max-h-[90vh] overflow-y-auto glass rounded-3xl p-6 md:p-8"
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Cerrar"
-          className="absolute top-4 right-4 inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 text-[var(--color-muted-foreground)] hover:text-white hover:border-white/30 transition"
-        >
-          <X className="h-4 w-4" />
-        </button>
-        <div className="mb-6 pr-10">
-          <Eyebrow>Lista de espera</Eyebrow>
-          <h3 className="mt-4 text-2xl md:text-3xl font-bold tracking-tight leading-tight">
-            Solicita tu acceso anticipado
-          </h3>
-          <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-            Cuéntanos sobre ti y te avisaremos cuando tengas acceso.
-          </p>
-        </div>
-        <WaitlistForm onSuccess={onClose} />
-      </motion.div>
-    </div>
-  );
-}
-
-function WaitlistCTA() {
-  return (
-    <Section id="waitlist" className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[800px] rounded-full bg-[var(--color-neon)]/10 blur-[140px]" />
-      </div>
-
-      <div className="flex flex-col items-center text-center max-w-3xl mx-auto">
-        <Eyebrow>Acceso anticipado</Eyebrow>
-        <motion.h2
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          transition={{ duration: 0.6 }}
-          className="mt-5 text-balance text-3xl md:text-5xl font-bold tracking-tight leading-[1.05]"
-        >
-          Construyamos juntos la próxima generación de mentorías empresariales.
-        </motion.h2>
-        <p className="mt-6 text-base md:text-lg text-[var(--color-muted-foreground)] leading-relaxed max-w-2xl">
-          Accede antes que nadie. Prueba las primeras versiones y comparte tu experiencia para construir una herramienta hecha para mentores como tú.
-        </p>
-
-        <div className="mt-10">
-          <NeonButton href="#waitlist" className="!px-8 !py-4 text-base">
-            Solicitar acceso anticipado
-            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-          </NeonButton>
-        </div>
-
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, delay: 0.15 }}
-          className="mt-10 max-w-2xl text-balance italic font-medium text-xl md:text-2xl leading-snug text-[var(--color-neon)] text-glow-neon"
-        >
-          “No estamos buscando usuarios. Estamos buscando mentores pioneros.”
-        </motion.p>
-      </div>
-    </Section>
-  );
-}
-function Field({
-  label,
-  name,
-  type = "text",
-  placeholder,
-  required,
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  placeholder?: string;
-  required?: boolean;
-}) {
-  return (
-    <div className="space-y-2">
-      <label htmlFor={name} className="text-xs font-medium uppercase tracking-wider text-[var(--color-muted-foreground)]">
-        {label}
-      </label>
-      <input
-        id={name}
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        required={required}
-        className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm placeholder:text-[var(--color-muted-foreground)]/60 outline-none focus:border-[var(--color-neon)]/60 focus:bg-black/40 focus:shadow-[0_0_0_4px_rgba(229,254,0,0.08)] transition"
-      />
-    </div>
-  );
-}
-
-/* ---------- Footer ---------- */
-
-function Footer() {
-  return (
-    <footer className="border-t border-white/5 px-6 md:px-10 lg:px-16 py-10">
-      <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex flex-col md:flex-row items-center gap-4">
-          <Logo />
-          <span className="text-xs text-[var(--color-muted-foreground)]">
-            Crea. Construye. Evoluciona.
-          </span>
-        </div>
-        <div className="flex items-center gap-6 text-xs text-[var(--color-muted-foreground)]">
-          <a href="#" className="hover:text-white transition">Privacidad</a>
-          <a href="#" className="hover:text-white transition">Términos</a>
-          <span>© {new Date().getFullYear()} Creaty</span>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
-/* ---------- Page ---------- */
-
-export default function Landing() {
-  const [modalOpen, setModalOpen] = useState(false);
-  return (
-    <WaitlistModalContext.Provider value={{ open: () => setModalOpen(true) }}>
-      <main className="min-h-screen bg-[var(--color-background)] text-[var(--color-foreground)] antialiased">
-        <Navbar />
-        <Hero />
-        <Problema />
-        <Solucion />
-        <Como />
-        <Beneficios />
-        <Diferencial />
-        <PruebaSocial />
-        <WaitlistCTA />
-        <Footer />
-      </main>
-      <WaitlistModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
-    </WaitlistModalContext.Provider>
-  );
-}
+export default function Landing(){const [open,setOpen]=useState(false);return <WaitlistContext.Provider value={{open:()=>setOpen(true)}}><Navbar/><main><Hero/><DashboardSection/><Problema/><Solucion/><Como/><Diferencial/><Credibility/><FinalCTA/></main><Footer/><WaitlistModal open={open} onClose={()=>setOpen(false)}/></WaitlistContext.Provider>}
