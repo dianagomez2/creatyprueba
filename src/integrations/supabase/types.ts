@@ -14,7 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      mentor_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          mentorship_mode: string
+          name: string
+          phone: string
+          professional_role: string
+          simultaneous_ventures: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          mentorship_mode: string
+          name: string
+          phone: string
+          professional_role: string
+          simultaneous_ventures: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          mentorship_mode?: string
+          name?: string
+          phone?: string
+          professional_role?: string
+          simultaneous_ventures?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
