@@ -5,3 +5,5 @@
 - [x] Guardar registros en Lovable Cloud
 - [x] Verificar escritorio, móvil, interacciones y textos antiguos
 - [x] Restaurar exactamente la tipografía anterior sin modificar el resto
+- [x] Eliminar flechas y anotaciones de ambos mockups
+- [x] Centralizar y reducir la escala fluida de titulares
