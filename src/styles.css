@@ -13,7 +13,7 @@
   --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
   --color-creaty-orange: var(--creaty-orange); --color-creaty-lime: var(--creaty-lime); --color-creaty-black: var(--creaty-black); --color-creaty-purple: var(--creaty-purple); --color-creaty-cream: var(--creaty-cream);
   --color-success: var(--creaty-success); --color-success-soft: var(--creaty-success-soft); --color-danger: var(--creaty-danger); --color-danger-soft: var(--creaty-danger-soft); --color-progress: var(--creaty-progress); --color-lime-soft: var(--creaty-lime-soft);
-  --font-display: "Poppins", system-ui, sans-serif; --font-sans: "Poppins", system-ui, sans-serif; --font-hand: "Kalam", cursive;
+  --font-display: "Poppins", system-ui, sans-serif; --font-sans: "Poppins", system-ui, sans-serif; --font-hand: "Poppins", system-ui, sans-serif;
 }
 
 :root {
@@ -24,9 +24,12 @@
   --primary: var(--creaty-lime); --primary-foreground: var(--creaty-black); --secondary: var(--creaty-purple); --secondary-foreground: var(--creaty-black); --muted: #e6e2dd; --muted-foreground: #696b63;
   --accent: var(--creaty-purple); --accent-foreground: var(--creaty-black); --destructive: var(--creaty-orange); --destructive-foreground: var(--creaty-cream); --border: color-mix(in oklab, var(--creaty-black) 12%, transparent); --input: #ffffff; --ring: var(--creaty-lime);
   --shadow-cta: 0 10px 35px -15px color-mix(in oklab, var(--creaty-lime) 70%, transparent); --shadow-nav: 0 10px 40px color-mix(in oklab, var(--creaty-black) 60%, transparent); --shadow-panel: 0 28px 80px -28px color-mix(in oklab, var(--creaty-black) 28%, transparent); --shadow-modal: 0 30px 100px color-mix(in oklab, var(--creaty-black) 75%, transparent);
+  --font-weight-heading: 500; --font-weight-label: 600; --font-weight-body: 400; --font-weight-button: 600;
 }
 .dark { --background: #ffffff; --foreground: var(--creaty-black); }
-@layer base { * { border-color: var(--color-border); } html { scroll-behavior: smooth; } body { margin:0; background:var(--creaty-black); color:var(--creaty-cream); font-family:var(--font-sans); -webkit-font-smoothing:antialiased; } button,a,select,input { font:inherit; } button { cursor:pointer; } }
+@layer base { * { border-color: var(--color-border); } html { scroll-behavior: smooth; } body { margin:0; background:var(--creaty-black); color:var(--creaty-cream); font-family:var(--font-sans); font-weight:var(--font-weight-body); -webkit-font-smoothing:antialiased; } h1,h2 { font-family:var(--font-display); font-weight:var(--font-weight-heading) !important; } h3,h4,h5,h6,label,strong,b { font-weight:var(--font-weight-label) !important; } button,a,select,input { font:inherit; } button { cursor:pointer; font-weight:var(--font-weight-button) !important; } }
+.font-black,.font-extrabold,.font-bold { font-weight:var(--font-weight-heading); }
+.font-semibold { font-weight:var(--font-weight-label); }
 @utility text-balance { text-wrap: balance; }
 @utility no-scrollbar { scrollbar-width:none; &::-webkit-scrollbar { display:none; } }
 @utility hero-grid { background-image:linear-gradient(color-mix(in oklab,var(--creaty-cream) 4%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in oklab,var(--creaty-cream) 4%,transparent) 1px,transparent 1px); background-size:56px 56px; mask-image:linear-gradient(to bottom,black,transparent 90%); }
