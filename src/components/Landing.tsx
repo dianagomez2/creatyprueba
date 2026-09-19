@@ -128,9 +128,9 @@ function Diferencial() {
         <div className="mt-7 space-y-3">{["Notion","Excel","CRM","Agenda de notas","Otros"].map(x => <div key={x} className="flex items-center gap-3 border-b border-creaty-black/8 pb-3 text-sm"><X className="h-4 w-4 text-creaty-orange"/>{x}</div>)}</div>
         <p className="mt-8 text-lg font-bold">Tú organizas, interpretas y decides qué sigue.</p>
       </div>
-      <div className="flex h-full flex-col rounded-lg bg-creaty-black p-5 text-creaty-cream sm:p-6 lg:p-8">
+      <div className="grid h-full grid-rows-[auto_1fr_auto] rounded-lg bg-creaty-black p-5 text-creaty-cream sm:p-6 lg:p-8">
         <p className="text-xs font-bold uppercase text-creaty-lime">Con Creaty</p>
-        <div className="flex flex-1 items-center py-8"><p className="type-card-title font-black">Mantiene contexto, conecta avances y te ayuda a preparar el siguiente paso.</p></div>
+        <div className="flex items-center py-6 lg:py-8"><p className="type-card-title font-black">Mantiene contexto, conecta avances y te ayuda a preparar el siguiente paso.</p></div>
         <div className="h-2 w-full rounded-full bg-creaty-cream/10"><div className="h-full w-4/5 rounded-full bg-creaty-lime"/></div>
       </div>
     </div>
