@@ -113,7 +113,24 @@ function Solucion(){return <Section id="solucion" light><div className="mx-auto 
 
 function Como(){const steps=[["01","Prepárate","Entiende dónde está cada emprendimiento y qué necesita atención antes de comenzar."],["02","Acompaña","Captura lo importante de la sesión y convierte acuerdos en tareas, responsables y próximos pasos claros."],["03","Da continuidad","Haz seguimiento a los avances y llega a la siguiente sesión sabiendo qué cambió y dónde aportar."]];return <Section id="como-funciona"><p className="text-xs font-bold uppercase text-creaty-purple">Tres pasos. Una mentoría más inteligente.</p><h2 className="type-section mt-3 font-black">Antes. Durante. Después. Sin perder el hilo.</h2><div className="mt-10 grid gap-3 md:grid-cols-3">{steps.map(([n,t,d],i)=><article key={n} className="rounded-lg border border-creaty-cream/10 p-6"><span className={`type-step-number font-black ${i===1?"text-creaty-orange":"text-creaty-lime"}`}>{n}</span><h3 className="type-card-title mt-6 font-bold">{t}</h3><p className="mt-3 text-sm leading-relaxed text-creaty-cream/55">{d}</p></article>)}</div><div className="mt-12 flex flex-col items-start justify-between gap-5 border-t border-creaty-cream/10 pt-8 md:flex-row md:items-center"><p className="max-w-xl font-semibold">Descubre cómo Creaty puede ayudarte a preparar, acompañar y dar seguimiento a tus emprendedores.</p><CTAButton>Haz tu diagnóstico gratis</CTAButton></div></Section>}
 
-function Diferencial(){return <Section id="diferencial" light><p className="text-xs font-bold uppercase text-creaty-orange">No es solo gestión de tareas</p><h2 className="type-section mt-3 font-black">Tus herramientas guardan información. Creaty te ayuda a convertirla en una mejor mentoría.</h2><div className="mt-10 grid overflow-hidden rounded-lg border border-creaty-black/10 lg:grid-cols-2"><div className="bg-background p-6 md:p-9"><p className="text-xs font-bold uppercase text-creaty-black/40">Otras herramientas</p><div className="mt-7 space-y-3">{["Notion","Excel","CRM","Agenda de notas","Otros"].map(x=><div key={x} className="flex items-center gap-3 border-b border-creaty-black/8 pb-3 text-sm"><X className="h-4 w-4 text-creaty-orange"/>{x}</div>)}</div><p className="mt-8 text-lg font-bold">Tú organizas, interpretas y decides qué sigue.</p></div><div className="bg-creaty-black p-6 text-creaty-cream md:p-9"><p className="text-xs font-bold uppercase text-creaty-lime">Con Creaty</p><div className="mt-7 flex min-h-48 items-center"><p className="type-card-title font-black">Mantiene contexto, conecta avances y te ayuda a preparar el siguiente paso.</p></div><div className="mt-5 h-2 w-full rounded-full bg-creaty-cream/10"><div className="h-full w-4/5 rounded-full bg-creaty-lime"/></div></div></div></div></Section>}
+function Diferencial() {
+  return <Section id="diferencial" light>
+    <p className="text-xs font-bold uppercase text-creaty-orange">No es solo gestión de tareas</p>
+    <h2 className="type-section mt-3 font-black">Tus herramientas guardan información. Creaty te ayuda a convertirla en una mejor mentoría.</h2>
+    <div className="mt-10 grid overflow-hidden rounded-lg border border-creaty-black/10 lg:grid-cols-2">
+      <div className="bg-background p-6 md:p-9">
+        <p className="text-xs font-bold uppercase text-creaty-black/40">Otras herramientas</p>
+        <div className="mt-7 space-y-3">{["Notion","Excel","CRM","Agenda de notas","Otros"].map(x => <div key={x} className="flex items-center gap-3 border-b border-creaty-black/8 pb-3 text-sm"><X className="h-4 w-4 text-creaty-orange"/>{x}</div>)}</div>
+        <p className="mt-8 text-lg font-bold">Tú organizas, interpretas y decides qué sigue.</p>
+      </div>
+      <div className="bg-creaty-black p-6 text-creaty-cream md:p-9">
+        <p className="text-xs font-bold uppercase text-creaty-lime">Con Creaty</p>
+        <div className="mt-7 flex min-h-48 items-center"><p className="type-card-title font-black">Mantiene contexto, conecta avances y te ayuda a preparar el siguiente paso.</p></div>
+        <div className="mt-5 h-2 w-full rounded-full bg-creaty-cream/10"><div className="h-full w-4/5 rounded-full bg-creaty-lime"/></div>
+      </div>
+    </div>
+  </Section>;
+}
 
 function Credibility(){return <Section light className="!pt-8"><div className="rounded-lg bg-creaty-purple/25 px-6 py-14 md:px-12"><div className="grid gap-8 md:grid-cols-[auto_1fr] md:items-center"><div className="grid h-16 w-16 place-items-center rounded-full bg-creaty-purple"><Users className="h-7 w-7"/></div><div><p className="text-xs font-bold uppercase text-creaty-black/50">Diseñado junto a mentores empresariales</p><h2 className="type-section mt-3 font-black">Construido con quienes saben lo que significa acompañar emprendedores.</h2><p className="type-support mt-4 text-creaty-black/60">Estamos desarrollando Creaty junto a mentores empresariales para convertir problemas reales de tu día a día en una herramienta que realmente ahorra tiempo y mejore tu acompañamiento.</p></div></div></div></Section>}
 
