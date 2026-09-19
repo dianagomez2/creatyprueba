@@ -7,3 +7,4 @@
 - [x] Restaurar exactamente la tipografía anterior sin modificar el resto
 - [x] Eliminar flechas y anotaciones de ambos mockups
 - [x] Centralizar y reducir la escala fluida de titulares
+- [x] Unificar contenedores, alineaciones, grillas y espaciados de toda la landing
