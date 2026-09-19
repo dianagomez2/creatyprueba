@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 const WaitlistContext = createContext<{ open: () => void }>({ open: () => undefined });
 
 function Section({ id, light = false, children, className = "" }: { id?: string; light?: boolean; children: ReactNode; className?: string }) {
-  return <section id={id} className={`${light ? "bg-creaty-cream text-creaty-black" : "bg-creaty-black text-creaty-cream"} relative w-full py-16 md:py-20 lg:py-28 ${className}`}><div className="site-container">{children}</div></section>;
+  return <section id={id} className={`${light ? "bg-creaty-cream text-creaty-black" : "bg-creaty-black text-creaty-cream"} relative w-full scroll-mt-20 py-16 md:py-20 lg:py-28 ${className}`}><div className="site-container">{children}</div></section>;
 }
 
 function SectionHeading({ eyebrow, title, description, centered = false, eyebrowClassName = "text-creaty-orange", descriptionClassName = "" }: { eyebrow?: string; title: string; description?: string; centered?: boolean; eyebrowClassName?: string; descriptionClassName?: string }) {
