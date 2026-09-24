@@ -14,3 +14,4 @@
 - [x] Limitar a escritorio los ajustes visuales de las tarjetas 01–04
 - [x] Compactar la primera pantalla de la sección de solución y revisar la comparativa en 1920×1080
 - [x] Redistribuir el navbar con centro geométrico y menú exclusivo para móvil
+- [x] Agrandecer el logo de la navbar un 30% sin alterar enlaces, botón ni footer
