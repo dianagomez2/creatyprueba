@@ -2,8 +2,9 @@ import { createContext, useContext, useEffect, useState, type FormEvent, type Re
 import { motion, useReducedMotion } from "motion/react";
 import {
   AlertTriangle, ArrowLeft, ArrowRight, Bell, BrainCircuit, CalendarDays, Check,
-  ChevronRight, ClipboardCheck, FileText, LayoutDashboard, Lightbulb, ListChecks,
-  Menu, MessageSquareText, Search, Sparkles, Target, Users, X,
+  CalendarCheck, ChevronRight, ClipboardCheck, Cloud, FileText, LayoutDashboard,
+  Lightbulb, ListChecks, Menu, MessageSquareText, Search, Sparkles, Table as TableIcon,
+  Target, Users, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import creatyLogo from "@/assets/creaty-logo.png";
@@ -117,20 +118,49 @@ function Solucion(){return <Section id="solucion" light><SectionHeading title={<
 
 function Como(){const steps=[["01","Prepárate","Entiende rápidamente dónde está cada emprendimiento y qué necesita atención antes de comenzar."],["02","Acompaña","Captura lo importante de la sesión y convierte acuerdos en tareas, responsables y próximos pasos claros."],["03","Da continuidad","Haz seguimiento a los avances y llega a la siguiente sesión sabiendo qué cambió y dónde aportar."]];return <Section id="como-funciona"><SectionHeading eyebrow="Tres pasos. Una mentoría más inteligente." eyebrowClassName="text-creaty-purple" title="Antes. Durante. Después. Sin perder el hilo."/><div className="mt-8 grid gap-4 md:grid-cols-3 lg:gap-6">{steps.map(([n,t,d],i)=><article key={n} className="h-full rounded-lg border border-creaty-cream/10 p-5 sm:p-6 lg:p-8"><span className={`type-step-number font-black ${i===1?"text-creaty-orange":"text-creaty-lime"}`}>{n}</span><h3 className="type-card-title mt-6 font-bold">{t}</h3><p className="mt-3 text-sm leading-relaxed text-creaty-cream/55">{d}</p></article>)}</div><div className="mx-auto mt-10 flex max-w-2xl flex-col items-center gap-5 text-center"><p className="text-pretty font-semibold">Descubre cómo Creaty puede ayudarte a preparar, acompañar y dar seguimiento a tus emprendedores.</p><CTAButton>Haz tu diagnóstico gratis</CTAButton></div></Section>}
 
+const comparisonRows = [
+  ["Centraliza información del emprendimiento", true, false, false, true, true],
+  ["Historial de sesiones y conversaciones", true, false, false, false, true],
+  ["Seguimiento de tareas y compromisos", true, true, false, false, true],
+  ["Recordatorios y alertas de seguimiento", false, false, true, false, true],
+  ["Visualización del proceso del emprendedor entre sesiones", false, false, true, false, true],
+  ["Recomendaciones y próximos pasos con IA", true, false, false, false, true],
+  ["Información adaptada a la etapa del emprendimiento", false, false, false, false, true],
+  ["Todo en un solo lugar, con enfoque en mentoría", false, false, false, false, true],
+] as const;
+
+function ComparisonValue({ enabled }: { enabled: boolean }) {
+  return enabled
+    ? <span className="mx-auto grid h-5 w-5 place-items-center rounded-full bg-success text-creaty-white"><Check aria-hidden="true" className="h-3 w-3" strokeWidth={3}/><span className="sr-only">Sí</span></span>
+    : <span className="mx-auto grid h-5 w-5 place-items-center text-creaty-orange"><X aria-hidden="true" className="h-4 w-4" strokeWidth={3}/><span className="sr-only">No</span></span>;
+}
+
 function Diferencial() {
-  return <Section id="diferencial" light>
+  const tools = [
+    { name: "Notion", Icon: FileText },
+    { name: "Excel", Icon: TableIcon },
+    { name: "CRM", Icon: Cloud },
+    { name: "Agenda de notas", Icon: CalendarCheck },
+  ];
+  return <Section id="diferencial" light className="py-10 md:py-12 lg:py-14">
     <SectionHeading title={<>Tus herramientas guardan información. <span className="text-creaty-orange">Creaty</span> te ayuda a convertirla en una mejor mentoría.</>} />
-    <div className="mt-8 grid items-stretch overflow-hidden rounded-lg border border-creaty-black/10 bg-background md:grid-cols-2">
-      <div className="h-full p-5 sm:p-6 lg:p-8">
-        <p className="text-xs font-bold uppercase text-creaty-black/40">Otras herramientas</p>
-        <div className="mt-7 space-y-3">{["Notion","Excel","CRM","Agenda de notas","Otros"].map(x => <div key={x} className="flex items-center gap-3 border-b border-creaty-black/8 pb-3 text-sm"><X className="h-4 w-4 text-creaty-orange"/>{x}</div>)}</div>
-        <p className="mt-8 text-lg font-bold">Tú organizas, interpretas y decides qué sigue.</p>
-      </div>
-      <div className="grid h-full grid-rows-[auto_1fr_auto] border-t border-creaty-lime bg-creaty-lime/20 p-5 text-creaty-black sm:p-6 md:border-l md:border-t-0 lg:p-8">
-        <p className="type-card-title font-semibold text-creaty-black">Con Creaty</p>
-        <div className="flex items-center py-6 lg:py-8"><p className="text-xl font-black md:text-2xl">Mantiene contexto, conecta avances y te ayuda a preparar el siguiente paso.</p></div>
-        <div className="h-2 w-full rounded-full bg-creaty-black/10"><div className="h-full w-4/5 rounded-full bg-creaty-lime"/></div>
-      </div>
+    <div className="mx-auto mt-8 max-w-[1100px] overflow-x-auto rounded-2xl border border-comparison-line bg-creaty-black">
+      <table className="w-full min-w-[720px] table-fixed border-collapse text-creaty-white">
+        <colgroup><col className="w-[35%]"/><col className="w-[12%]"/><col className="w-[12%]"/><col className="w-[12%]"/><col className="w-[12%]"/><col className="w-[17%]"/></colgroup>
+        <thead>
+          <tr className="border-b border-comparison-line">
+            <th scope="col" className="sticky left-0 z-20 h-[76px] bg-creaty-black px-4 text-left text-sm font-semibold">Funcionalidad</th>
+            {tools.map(({ name, Icon }) => <th key={name} scope="col" className="h-[76px] border-l border-comparison-line px-2 text-center"><Icon aria-hidden="true" className="mx-auto mb-1 h-5 w-5"/><span className="block text-xs font-medium">{name}</span></th>)}
+            <th scope="col" className="h-[86px] border-x border-t border-creaty-lime bg-creaty-black px-3 text-center"><span className="block text-lg font-semibold text-creaty-lime">Con Creaty</span><span className="mt-1 block text-[11px] font-normal leading-tight text-creaty-white">Todo en un solo lugar,<br/>con enfoque en mentoría.</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {comparisonRows.map(([feature, ...values], rowIndex) => <tr key={feature} className="h-10 border-b border-comparison-line last:border-b-0">
+            <th scope="row" className="sticky left-0 z-10 bg-creaty-black px-4 py-2 text-left text-[13px] font-normal leading-snug text-creaty-cream">{feature}</th>
+            {values.map((enabled, columnIndex) => <td key={columnIndex} className={`border-l px-2 py-2 text-center ${columnIndex === 4 ? `border-x border-creaty-lime bg-comparison-highlight text-creaty-black ${rowIndex === comparisonRows.length - 1 ? "border-b" : ""}` : "border-comparison-line"}`}><ComparisonValue enabled={enabled}/></td>)}
+          </tr>)}
+        </tbody>
+      </table>
     </div>
   </Section>;
 }

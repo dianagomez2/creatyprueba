@@ -10,3 +10,4 @@
 - [x] Unificar contenedores, alineaciones, grillas y espaciados de toda la landing
 - [x] Mantener todos los encabezados de sección en una sola columna vertical
 - [x] Aplicar ajustes integrales de diseño, contraste y copy por sección
+- [x] Reemplazar los bloques de la comparativa por una tabla accesible y adaptable
