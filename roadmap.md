@@ -9,3 +9,4 @@
 - [x] Centralizar y reducir la escala fluida de titulares
 - [x] Unificar contenedores, alineaciones, grillas y espaciados de toda la landing
 - [x] Mantener todos los encabezados de sección en una sola columna vertical
+- [x] Aplicar ajustes integrales de diseño, contraste y copy por sección
