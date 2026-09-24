@@ -131,7 +131,7 @@ const comparisonRows = [
 
 function ComparisonValue({ enabled }: { enabled: boolean }) {
   return enabled
-    ? <span className="mx-auto grid h-5 w-5 place-items-center rounded-full bg-success text-creaty-white"><Check aria-hidden="true" className="h-3 w-3" strokeWidth={3}/><span className="sr-only">Sí</span></span>
+    ? <span className="mx-auto grid h-5 w-5 place-items-center rounded-full bg-comparison-success text-creaty-white"><Check aria-hidden="true" className="h-3 w-3" strokeWidth={3}/><span className="sr-only">Sí</span></span>
     : <span className="mx-auto grid h-5 w-5 place-items-center text-creaty-orange"><X aria-hidden="true" className="h-4 w-4" strokeWidth={3}/><span className="sr-only">No</span></span>;
 }
 
