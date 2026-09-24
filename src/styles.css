@@ -12,14 +12,14 @@
   --color-accent: var(--accent); --color-accent-foreground: var(--accent-foreground); --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border); --color-input: var(--input); --color-ring: var(--ring);
   --color-creaty-orange: var(--creaty-orange); --color-creaty-lime: var(--creaty-lime); --color-creaty-black: var(--creaty-black); --color-creaty-purple: var(--creaty-purple); --color-creaty-cream: var(--creaty-cream); --color-creaty-white: var(--creaty-white);
-  --color-success: var(--creaty-success); --color-success-soft: var(--creaty-success-soft); --color-danger: var(--creaty-danger); --color-danger-soft: var(--creaty-danger-soft); --color-progress: var(--creaty-progress); --color-lime-soft: var(--creaty-lime-soft);
+  --color-success: var(--creaty-success); --color-success-soft: var(--creaty-success-soft); --color-danger: var(--creaty-danger); --color-danger-soft: var(--creaty-danger-soft); --color-progress: var(--creaty-progress); --color-lime-soft: var(--creaty-lime-soft); --color-comparison-line: var(--comparison-line); --color-comparison-highlight: var(--comparison-highlight); --color-comparison-success: var(--comparison-success);
   --font-display: "Poppins", system-ui, sans-serif; --font-sans: "Poppins", system-ui, sans-serif; --font-hand: "Poppins", system-ui, sans-serif;
 }
 
 :root {
   --radius: .5rem;
   --creaty-orange: #fd5102; --creaty-lime: #e5fe00; --creaty-black: #10110e; --creaty-purple: #c8a1e7; --creaty-cream: #f2eee9; --creaty-white: #ffffff;
-  --creaty-success: #248a5a; --creaty-success-soft: #def4e7; --creaty-danger: #b43c43; --creaty-danger-soft: #fae4e5; --creaty-progress: #56a876; --creaty-track: #e4e3de; --creaty-lime-soft: #eff8c8;
+  --creaty-success: #248a5a; --creaty-success-soft: #def4e7; --creaty-danger: #b43c43; --creaty-danger-soft: #fae4e5; --creaty-progress: #56a876; --creaty-track: #e4e3de; --creaty-lime-soft: #eff8c8; --comparison-line: rgb(255 255 255 / 8%); --comparison-highlight: #f1ffb0; --comparison-success: #16a34a;
   --background: #ffffff; --foreground: var(--creaty-black); --card: #ffffff; --card-foreground: var(--creaty-black); --popover: #ffffff; --popover-foreground: var(--creaty-black);
   --primary: var(--creaty-lime); --primary-foreground: var(--creaty-black); --secondary: var(--creaty-purple); --secondary-foreground: var(--creaty-black); --muted: #e6e2dd; --muted-foreground: #696b63;
   --accent: var(--creaty-purple); --accent-foreground: var(--creaty-black); --destructive: var(--creaty-orange); --destructive-foreground: var(--creaty-cream); --border: color-mix(in oklab, var(--creaty-black) 12%, transparent); --input: #ffffff; --ring: var(--creaty-lime);
