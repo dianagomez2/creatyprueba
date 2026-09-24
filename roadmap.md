@@ -11,3 +11,5 @@
 - [x] Mantener todos los encabezados de sección en una sola columna vertical
 - [x] Aplicar ajustes integrales de diseño, contraste y copy por sección
 - [x] Reemplazar los bloques de la comparativa por una tabla accesible y adaptable
+- [x] Limitar a escritorio los ajustes visuales de las tarjetas 01–04
+- [x] Compactar la primera pantalla de la sección de solución y revisar la comparativa en 1920×1080
