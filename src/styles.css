@@ -25,8 +25,8 @@
   --accent: var(--creaty-purple); --accent-foreground: var(--creaty-black); --destructive: var(--creaty-orange); --destructive-foreground: var(--creaty-cream); --border: color-mix(in oklab, var(--creaty-black) 12%, transparent); --input: #ffffff; --ring: var(--creaty-lime);
   --shadow-cta: 0 10px 35px -15px color-mix(in oklab, var(--creaty-lime) 70%, transparent); --shadow-nav: 0 10px 40px color-mix(in oklab, var(--creaty-black) 60%, transparent); --shadow-panel: 0 28px 80px -28px color-mix(in oklab, var(--creaty-black) 28%, transparent); --shadow-modal: 0 30px 100px color-mix(in oklab, var(--creaty-black) 75%, transparent);
   --font-weight-heading: 500; --font-weight-label: 600; --font-weight-body: 400; --font-weight-button: 600;
-  --text-hero: clamp(2.25rem, 4.5vw, 4.5rem); --leading-hero: 1.08;
-  --text-section: clamp(1.75rem, 3vw, 3rem); --leading-section: 1.15;
+  --text-hero: clamp(2.25rem, 4.2vw, 4.125rem); --leading-hero: 1.08;
+  --text-section: clamp(1.75rem, 2.7vw, 2.625rem); --leading-section: 1.15;
   --text-card-title: clamp(1.125rem, 1.5vw, 1.375rem); --leading-card-title: 1.25;
   --text-support: clamp(1rem, 1.25vw, 1.25rem); --leading-support: 1.55;
   --text-step-number: clamp(2.5rem, 4vw, 3.75rem);
@@ -40,14 +40,15 @@
 @utility hero-grid { background-image:linear-gradient(color-mix(in oklab,var(--creaty-cream) 4%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in oklab,var(--creaty-cream) 4%,transparent) 1px,transparent 1px); background-size:56px 56px; mask-image:linear-gradient(to bottom,black,transparent 90%); }
 .site-container { width:100%; max-width:1280px; margin-inline:auto; padding-inline:20px; }
 .type-hero { max-width:1000px; font-size:var(--text-hero); line-height:var(--leading-hero); text-wrap:balance; }
-.type-section { max-width:1100px; font-size:var(--text-section); line-height:var(--leading-section); text-wrap:balance; }
+.type-section { max-width:1050px; font-size:var(--text-section); line-height:var(--leading-section); text-wrap:balance; }
 .type-card-title { font-size:var(--text-card-title); line-height:var(--leading-card-title); text-wrap:balance; }
 .type-support { max-width:760px; font-size:var(--text-support); line-height:var(--leading-support); text-wrap:pretty; }
 .type-step-number { font-size:var(--text-step-number); line-height:1; }
-.section-heading { display:block; }
+.section-heading { display:block; margin-inline:auto; }
 .section-heading > div { min-width:0; }
-.section-heading .type-support { margin-top:20px; }
+.section-heading .type-support { margin-top:16px; }
 .section-heading p { text-wrap:pretty; }
+.dashboard-subtitle { max-width:860px; font-weight:var(--font-weight-heading); }
 .process-stepper { display:grid; gap:18px; }
 .process-step { position:relative; display:grid; grid-template-columns:30px 1fr; align-items:start; gap:10px; }
 .process-step:not(:last-child)::after { content:""; position:absolute; left:14px; top:28px; height:20px; width:2px; background:var(--creaty-track); }
