@@ -26,7 +26,7 @@ function CTAButton({ children, className = "", dark = false }: { children: React
 }
 
 function Logo({ compact = false }: { compact?: boolean }) {
-  return <a href="#top" aria-label="Ir al inicio" className="inline-flex shrink-0 items-center"><img src={creatyLogo} alt="Creaty" className={`${compact ? "h-11 md:h-14" : "h-14 md:h-[72px]"} w-auto object-contain`} /></a>;
+  return <a href="#top" aria-label="Ir al inicio" className="inline-flex shrink-0 items-center"><img src={creatyLogo} alt="Creaty" className={`${compact ? "h-7 md:h-8" : "h-14 md:h-[72px]"} w-auto object-contain`} /></a>;
 }
 
 function Navbar() {
@@ -39,12 +39,12 @@ function Navbar() {
   }, []);
   const links = [["Por qué Creaty", "#problema"], ["Cómo te ayuda", "#solucion"], ["Cómo funciona", "#como-funciona"], ["Por qué es diferente", "#diferencial"]];
   return <header className={`fixed inset-x-0 top-0 z-[100] border-b transition-all duration-300 ${scrolled || menuOpen ? "border-creaty-cream/10 bg-creaty-black/95 shadow-[var(--shadow-nav)] backdrop-blur-xl" : "border-transparent bg-transparent"}`}>
-    <div className="site-container grid grid-cols-[auto_1fr_auto] items-center gap-3 py-2">
-      <Logo compact />
-      <nav className="hidden items-center justify-center gap-7 lg:flex">{links.map(([label, href]) => <a key={href} href={href} className="text-sm font-medium text-creaty-cream/65 transition hover:text-creaty-cream">{label}</a>)}</nav>
-      <div className="flex items-center justify-end gap-2"><CTAButton className="min-h-10 px-3 py-2 text-[11px] sm:px-4 sm:text-xs">Regístrate ahora</CTAButton><button type="button" aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} className="grid h-10 w-10 place-items-center rounded-md border border-creaty-cream/15 text-creaty-cream lg:hidden">{menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button></div>
+    <div className="site-container relative grid min-h-16 grid-cols-[1fr_auto] items-center gap-3 py-2 md:grid-cols-[1fr_auto_1fr]">
+      <div className="justify-self-start"><Logo compact /></div>
+      <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-3 whitespace-nowrap md:flex min-[900px]:gap-5 lg:static lg:translate-x-0 lg:justify-self-center lg:gap-9">{links.map(([label, href]) => <a key={href} href={href} className="text-xs font-medium text-creaty-cream/65 transition-colors hover:text-creaty-white min-[900px]:text-[13px] lg:text-sm">{label}</a>)}</nav>
+      <div className="flex items-center justify-self-end gap-2 md:col-start-3"><CTAButton className="navbar-cta whitespace-nowrap px-3 py-2 text-[11px] lg:px-5 lg:text-sm">Regístrate ahora</CTAButton><button type="button" aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"} aria-expanded={menuOpen} onClick={() => setMenuOpen(v => !v)} className="grid h-10 w-10 place-items-center rounded-md border border-creaty-cream/15 text-creaty-cream md:hidden">{menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button></div>
     </div>
-    {menuOpen && <nav className="border-t border-creaty-cream/10 bg-creaty-black lg:hidden"><div className="site-container py-4">{links.map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)} className="block border-b border-creaty-cream/10 py-3 text-sm text-creaty-cream/80 last:border-0">{label}</a>)}</div></nav>}
+    {menuOpen && <nav className="border-t border-creaty-cream/10 bg-creaty-black md:hidden"><div className="site-container py-4">{links.map(([label, href]) => <a key={href} href={href} onClick={() => setMenuOpen(false)} className="block border-b border-creaty-cream/10 py-3 text-sm text-creaty-cream/80 last:border-0">{label}</a>)}</div></nav>}
   </header>;
 }
 
