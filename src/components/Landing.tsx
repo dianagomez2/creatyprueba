@@ -142,7 +142,7 @@ function Diferencial() {
     { name: "CRM", Icon: Cloud },
     { name: "Agenda de notas", Icon: CalendarCheck },
   ];
-  return <Section id="diferencial" light className="py-10 md:py-12 lg:py-14">
+  return <Section id="diferencial" light className="overflow-x-clip py-10 md:py-12 lg:py-14">
     <SectionHeading title={<>Tus herramientas guardan información. <span className="text-creaty-orange">Creaty</span> te ayuda a convertirla en una mejor mentoría.</>} />
     <div className="mx-auto mt-8 max-w-[1100px] overflow-x-auto rounded-2xl border border-comparison-line bg-creaty-black">
       <table className="w-full min-w-[720px] table-fixed border-collapse text-creaty-white">
